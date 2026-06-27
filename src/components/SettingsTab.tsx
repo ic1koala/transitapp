@@ -44,56 +44,91 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ avoidModes, onChangeAv
         {/* ルート優先設定 */}
         <div>
           <h3 className="text-sm font-bold uppercase tracking-wider text-gray-400 mb-3">回避する交通手段</h3>
-          <div className="rounded-lg bg-var-bg-surface overflow-hidden" style={{ backgroundColor: 'var(--bg-surface)' }}>
+          <div className="rounded-lg overflow-hidden" style={{ backgroundColor: 'var(--bg-surface)' }}>
             
             {/* バス */}
             <button
-              className="w-full flex items-center justify-between p-4 border-b border-gray-850 hover:bg-var-bg-card-hover transition"
+              className="w-full flex items-center justify-between p-4 border-b border-gray-800 hover:bg-var-bg-card-hover transition"
+              style={{
+                background: 'transparent',
+                border: 'none',
+                borderBottom: '1px solid var(--border-gray)',
+                cursor: 'pointer',
+                textAlign: 'left'
+              }}
               onClick={() => toggleMode('bus')}
             >
-              <span className="text-sm font-bold text-white">路線バスを除外</span>
+              <span className={`text-sm font-bold ${avoidModes.includes('bus') ? 'text-red-400' : 'text-white'}`}>
+                路線バスを除外 {avoidModes.includes('bus') && '（設定中）'}
+              </span>
               <div
-                className="w-5 h-5 rounded-full border border-gray-600 flex items-center justify-center transition-all"
+                className="w-5 h-5 rounded-full border flex items-center justify-center transition-all"
                 style={{
                   backgroundColor: avoidModes.includes('bus') ? 'var(--accent)' : 'transparent',
-                  borderColor: avoidModes.includes('bus') ? 'var(--accent)' : 'var(--border-gray)'
+                  borderColor: avoidModes.includes('bus') ? 'var(--accent)' : 'var(--border-gray)',
+                  width: '20px',
+                  height: '20px',
+                  borderRadius: '50%'
                 }}
               >
-                {avoidModes.includes('bus') && <Check size={12} className="text-black font-bold" />}
+                {avoidModes.includes('bus') && <Check size={12} style={{ color: '#000000', fontWeight: 'bold' }} />}
               </div>
             </button>
 
             {/* 飛行機 */}
             <button
-              className="w-full flex items-center justify-between p-4 border-b border-gray-850 hover:bg-var-bg-card-hover transition"
+              className="w-full flex items-center justify-between p-4 border-b border-gray-800 hover:bg-var-bg-card-hover transition"
+              style={{
+                background: 'transparent',
+                border: 'none',
+                borderBottom: '1px solid var(--border-gray)',
+                cursor: 'pointer',
+                textAlign: 'left'
+              }}
               onClick={() => toggleMode('air')}
             >
-              <span className="text-sm font-bold text-white">飛行機 (空路) を除外</span>
+              <span className={`text-sm font-bold ${avoidModes.includes('air') ? 'text-red-400' : 'text-white'}`}>
+                飛行機 (空路) を除外 {avoidModes.includes('air') && '（設定中）'}
+              </span>
               <div
-                className="w-5 h-5 rounded-full border border-gray-600 flex items-center justify-center transition-all"
+                className="w-5 h-5 rounded-full border flex items-center justify-center transition-all"
                 style={{
                   backgroundColor: avoidModes.includes('air') ? 'var(--accent)' : 'transparent',
-                  borderColor: avoidModes.includes('air') ? 'var(--accent)' : 'var(--border-gray)'
+                  borderColor: avoidModes.includes('air') ? 'var(--accent)' : 'var(--border-gray)',
+                  width: '20px',
+                  height: '20px',
+                  borderRadius: '50%'
                 }}
               >
-                {avoidModes.includes('air') && <Check size={12} className="text-black font-bold" />}
+                {avoidModes.includes('air') && <Check size={12} style={{ color: '#000000', fontWeight: 'bold' }} />}
               </div>
             </button>
 
             {/* フェリー */}
             <button
               className="w-full flex items-center justify-between p-4 hover:bg-var-bg-card-hover transition"
+              style={{
+                background: 'transparent',
+                border: 'none',
+                cursor: 'pointer',
+                textAlign: 'left'
+              }}
               onClick={() => toggleMode('ferry')}
             >
-              <span className="text-sm font-bold text-white">フェリー (航路) を除外</span>
+              <span className={`text-sm font-bold ${avoidModes.includes('ferry') ? 'text-red-400' : 'text-white'}`}>
+                フェリー (航路) を除外 {avoidModes.includes('ferry') && '（設定中）'}
+              </span>
               <div
-                className="w-5 h-5 rounded-full border border-gray-600 flex items-center justify-center transition-all"
+                className="w-5 h-5 rounded-full border flex items-center justify-center transition-all"
                 style={{
                   backgroundColor: avoidModes.includes('ferry') ? 'var(--accent)' : 'transparent',
-                  borderColor: avoidModes.includes('ferry') ? 'var(--accent)' : 'var(--border-gray)'
+                  borderColor: avoidModes.includes('ferry') ? 'var(--accent)' : 'var(--border-gray)',
+                  width: '20px',
+                  height: '20px',
+                  borderRadius: '50%'
                 }}
               >
-                {avoidModes.includes('ferry') && <Check size={12} className="text-black font-bold" />}
+                {avoidModes.includes('ferry') && <Check size={12} style={{ color: '#000000', fontWeight: 'bold' }} />}
               </div>
             </button>
 
@@ -105,10 +140,17 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ avoidModes, onChangeAv
           <h3 className="text-sm font-bold uppercase tracking-wider text-gray-400 mb-3">システムテスト</h3>
           <button
             className="w-full btn-pill justify-start p-4 hover:bg-var-bg-card-hover transition rounded-lg"
-            style={{ display: 'flex', width: '100%', backgroundColor: 'var(--bg-surface)', border: 'none' }}
+            style={{
+              display: 'flex',
+              width: '100%',
+              backgroundColor: 'var(--bg-surface)',
+              border: 'none',
+              cursor: 'pointer',
+              alignItems: 'center'
+            }}
             onClick={handleTestGeolocation}
           >
-            <MapPin size={18} className="text-accent mr-3" style={{ color: 'var(--accent)' }} />
+            <MapPin size={18} className="text-accent mr-3" style={{ color: 'var(--accent)', marginRight: '12px' }} />
             <span className="text-sm font-bold text-white">GPS (現在地) 取得テスト</span>
           </button>
         </div>
@@ -116,15 +158,15 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ avoidModes, onChangeAv
         {/* アプリ情報 */}
         <div>
           <h3 className="text-sm font-bold uppercase tracking-wider text-gray-400 mb-3">アプリについて</h3>
-          <div className="p-4 rounded-lg bg-var-bg-surface space-y-3" style={{ backgroundColor: 'var(--bg-surface)' }}>
+          <div className="p-4 rounded-lg space-y-3" style={{ backgroundColor: 'var(--bg-surface)' }}>
             <div className="flex items-center gap-3">
-              <Info size={18} className="text-gray-400" />
+              <Info size={18} className="text-gray-400" style={{ marginRight: '12px' }} />
               <div>
                 <div className="text-sm font-bold text-white">Transit 乗換案内 v1.0.0</div>
                 <div className="text-xs text-gray-500">Spotify UI Inspired Edition</div>
               </div>
             </div>
-            <p className="text-xs text-gray-400 leading-relaxed border-t border-gray-800 pt-3">
+            <p className="text-xs text-gray-400 leading-relaxed border-t border-gray-800 pt-3" style={{ borderTop: '1px solid var(--border-gray)', paddingTop: '12px' }}>
               本アプリは、日本の公共交通オープンデータ（GTFS / ODPT）を利用した個人用途の乗換検索ウェブアプリです。
               地図データは CartoDB のダークスタイルを使用しています。
             </p>

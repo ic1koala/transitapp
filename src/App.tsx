@@ -8,8 +8,13 @@ import { ResultsView } from './components/ResultsView';
 type TabType = 'search' | 'library' | 'settings';
 
 interface Place {
-  name: string;
+  id: string;
   endpoint: string;
+  name: string;
+  kind: string;
+  lat: number;
+  lon: number;
+  description?: string;
 }
 
 function App() {
@@ -20,6 +25,16 @@ function App() {
   const [searchResult, setSearchResult] = useState<any[] | null>(null);
   const [loading, setLoading] = useState(false);
   const [searchError, setSearchError] = useState<string | null>(null);
+
+  // 1本前・1本後のための検索条件キャッシュ
+  const [searchCache, setSearchCache] = useState<{
+    from: Place;
+    to: Place;
+    vias: Place[];
+    searchType: 'departure' | 'arrival' | 'first' | 'last';
+    date: string; // YYYYMMDD
+    time: string; // HH:MM
+  } | null>(null);
   
   // 回避設定 (Settings から連動)
   const [avoidModes, setAvoidModes] = useState<string[]>(() => {
@@ -46,6 +61,16 @@ function App() {
     setSearchError(null);
     setSearchResult(null);
 
+    // キャッシュ保存（1本前・1本後用）
+    setSearchCache({
+      from,
+      to,
+      vias,
+      searchType,
+      date: targetDate,
+      time: targetTime
+    });
+
     // 回避パラメータ
     let queryParams = `from=${encodeURIComponent(from.endpoint)}&to=${encodeURIComponent(to.endpoint)}`;
     
@@ -67,7 +92,6 @@ function App() {
     }
 
     try {
-      // /api/v1/guidance/plan からガイド付き検索プランを取得
       const url = `https://api.transit.ls8h.com/api/v1/guidance/plan?${queryParams}`;
       const res = await fetch(url);
       
@@ -90,20 +114,78 @@ function App() {
     }
   };
 
+  // 1本前・1本後の再検索を実行する処理
+  const handleOffsetSearch = (offsetMinutes: number) => {
+    if (!searchCache) return;
+
+    // 現在のキャッシュ日時からDateオブジェクトを作成
+    const year = parseInt(searchCache.date.substring(0, 4));
+    const month = parseInt(searchCache.date.substring(4, 6)) - 1;
+    const day = parseInt(searchCache.date.substring(6, 8));
+    const [hours, minutes] = searchCache.time.split(':').map(Number);
+
+    const currentDate = new Date(year, month, day, hours, minutes);
+    // 時間をオフセット（例: ±30分）
+    currentDate.setMinutes(currentDate.getMinutes() + offsetMinutes);
+
+    // 再整形
+    const newDateStr = `${currentDate.getFullYear()}${String(currentDate.getMonth() + 1).padStart(2, '0')}${String(currentDate.getDate()).padStart(2, '0')}`;
+    const newTimeStr = `${String(currentDate.getHours()).padStart(2, '0')}:${String(currentDate.getMinutes()).padStart(2, '0')}`;
+
+    // 再検索
+    handleSearch(
+      searchCache.from,
+      searchCache.to,
+      searchCache.vias,
+      searchCache.searchType,
+      newDateStr,
+      newTimeStr
+    );
+  };
+
   // LibraryTab から駅が選択された場合
-  const handleSelectStationFromLibrary = (station: Place) => {
-    setFromPlace(station);
+  const handleSelectStationFromLibrary = (station: { name: string; endpoint: string }) => {
+    const place: Place = {
+      id: '',
+      endpoint: station.endpoint,
+      name: station.name,
+      kind: 'station',
+      lat: 0,
+      lon: 0
+    };
+    setFromPlace(place);
     setActiveTab('search');
   };
 
   // LibraryTab からルートが選択された場合
-  const handleSelectRouteFromLibrary = (from: Place, to: Place) => {
+  const handleSelectRouteFromLibrary = (
+    from: { name: string; endpoint: string },
+    to: { name: string; endpoint: string }
+  ) => {
     setActiveTab('search');
-    // 現在日時で即時検索
+    const fromPlaceObj: Place = {
+      id: '',
+      endpoint: from.endpoint,
+      name: from.name,
+      kind: 'station',
+      lat: 0,
+      lon: 0
+    };
+    const toPlaceObj: Place = {
+      id: '',
+      endpoint: to.endpoint,
+      name: to.name,
+      kind: 'station',
+      lat: 0,
+      lon: 0
+    };
+    setFromPlace(fromPlaceObj);
+    setToPlace(toPlaceObj);
+    
     const now = new Date();
     const targetDate = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}`;
     const targetTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-    handleSearch(from, to, [], 'departure', targetDate, targetTime);
+    handleSearch(fromPlaceObj, toPlaceObj, [], 'departure', targetDate, targetTime);
   };
 
   // 検索結果から戻る
@@ -135,13 +217,15 @@ function App() {
       );
     }
 
-    if (searchResult && fromPlace && toPlace) {
+    if (searchResult && fromPlace && toPlace && searchCache) {
       return (
         <ResultsView
           options={searchResult}
           fromName={fromPlace.name}
           toName={toPlace.name}
+          searchTimeLabel={`${searchCache.time} 発`}
           onBack={handleBackToSearch}
+          onOffsetSearch={handleOffsetSearch}
         />
       );
     }
