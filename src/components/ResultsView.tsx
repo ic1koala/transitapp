@@ -338,7 +338,7 @@ export const ResultsView: React.FC<ResultsViewProps> = ({
           backgroundColor: '#0a0a0a'
         }}
       >
-        {/* マップ (アクティブな経路がある場合のみ、または常に最初の経路の地図を描画) */}
+        {/* マップ */}
         {(activeOption || sortedOptions[0]) && (
           <div style={{ borderRadius: '12px', overflow: 'hidden', border: '1px solid #1a1a1a', boxShadow: '0 4px 15px rgba(0,0,0,0.5)', marginBottom: '12px', height: '140px' }}>
             <DarkMap
@@ -349,7 +349,7 @@ export const ResultsView: React.FC<ResultsViewProps> = ({
           </div>
         )}
 
-        {/* 経路リスト (縦幅を従来の40%程度にコンパクト化) */}
+        {/* 経路リスト */}
         <div className="space-y-2.5">
           {sortedOptions.map((option) => {
             const isActive = option.id === activeOptionId;
@@ -367,14 +367,14 @@ export const ResultsView: React.FC<ResultsViewProps> = ({
                   border: isActive ? '1px solid var(--accent)' : '1px solid #1c1c1c',
                   boxShadow: isActive ? '0 6px 20px rgba(30, 215, 96, 0.06)' : 'var(--shadow-medium)',
                   borderRadius: '8px',
-                  padding: '10px 12px', // パディングを圧縮
+                  padding: '10px 12px',
                   marginBottom: '8px',
                   cursor: 'pointer',
                   transform: isActive ? 'scale(1.005)' : 'scale(1)'
                 }}
                 onClick={() => setActiveOptionId(isActive ? null : option.id)}
               >
-                {/* カードヘッダー (コンパクト化) */}
+                {/* カードヘッダー */}
                 <div className="flex justify-between items-center" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <div className="space-y-0.5">
                     {renderYahooBadges(option)}
@@ -392,7 +392,7 @@ export const ResultsView: React.FC<ResultsViewProps> = ({
                   </div>
                 </div>
 
-                {/* 路線アイコンのタイムライン概要 (コンパクト化) */}
+                {/* 路線アイコンのタイムライン概要 */}
                 <div className="flex items-center gap-1 mt-1.5 overflow-x-auto py-0.5 text-xs" style={{ display: 'flex', alignItems: 'center', marginTop: '6px', overflowX: 'auto' }}>
                   {option.journey.legs.map((leg, lIdx) => (
                     <React.Fragment key={lIdx}>
@@ -417,7 +417,7 @@ export const ResultsView: React.FC<ResultsViewProps> = ({
                   ))}
                 </div>
 
-                {/* アコーディオン詳細タイムライン (大幅にコンパクト化) */}
+                {/* アコーディオン詳細タイムライン */}
                 <div
                   style={{
                     display: 'grid',
@@ -478,7 +478,7 @@ export const ResultsView: React.FC<ResultsViewProps> = ({
                                   <div className="text-xs font-black text-white flex items-center gap-1.5" style={{ display: 'flex', alignItems: 'center' }}>
                                     <span style={{ fontSize: '12px', fontWeight: '800' }}>{leg.from.name}</span>
                                     {leg.from.platformCode && (
-                                      <span style={{ fontSize: '9px', backgroundColor: '#222', color: '#999', padding: '1px 4px', borderRadius: '3px', marginLeft: '4px', fontWeight: '700' }}>{leg.from.platformCode}番線</span>
+                                      <span style={{ fontSize: '9px', backgroundColor: '#222', color: '#ffa42b', padding: '1px 4px', borderRadius: '3px', marginLeft: '4px', fontWeight: '700' }}>{leg.from.platformCode}番線発</span>
                                     )}
                                   </div>
                                 </div>
@@ -500,34 +500,60 @@ export const ResultsView: React.FC<ResultsViewProps> = ({
                                 </div>
                               </div>
 
-                              {/* 降車駅（最終レグのみ） */}
-                              {isLastLeg && (
-                                <div className="relative flex items-start justify-between min-h-[26px] pt-1" style={{ position: 'relative', display: 'flex', justifyContent: 'space-between', minHeight: '26px', paddingTop: '4px' }}>
+                              {/* 降車駅（毎レグ必ず描画し、乗換ホームも漏れなく可視化） */}
+                              <div className="relative flex items-start justify-between min-h-[26px] pt-1" style={{ position: 'relative', display: 'flex', justifyContent: 'space-between', minHeight: '26px', paddingTop: '4px' }}>
+                                <div
+                                  className="absolute left-[-21px] top-[6px] w-[10px] h-[10px] rounded-full bg-var-bg-base border-2 z-10"
+                                  style={{
+                                    position: 'absolute',
+                                    left: '-21px',
+                                    top: '6px',
+                                    width: '10px',
+                                    height: '10px',
+                                    borderRadius: '50%',
+                                    border: '2.5px solid var(--accent)',
+                                    backgroundColor: '#121212',
+                                    zIndex: 10
+                                  }}
+                                />
+                                <div>
+                                  <div className="text-xs font-black text-white flex items-center gap-1.5" style={{ display: 'flex', alignItems: 'center' }}>
+                                    <span style={{ fontSize: '12px', fontWeight: '800' }}>{leg.to.name}</span>
+                                    {leg.to.platformCode && (
+                                      <span style={{ fontSize: '9px', backgroundColor: '#222', color: '#539df5', padding: '1px 4px', borderRadius: '3px', marginLeft: '4px', fontWeight: '700' }}>{leg.to.platformCode}番線着</span>
+                                    )}
+                                    {!isLastLeg && (
+                                      <span style={{ fontSize: '8px', backgroundColor: '#3a2a1a', color: '#ffa42b', padding: '1px 3px', borderRadius: '2px', marginLeft: '4px', fontWeight: '750' }}>乗換</span>
+                                    )}
+                                  </div>
+                                </div>
+                                <div className="text-[10px] font-bold text-gray-300" style={{ fontSize: '11px', fontWeight: '700' }}>{formatTime(leg.arrivalSecs)}</div>
+                              </div>
+
+                              {/* 乗換・待ち時間表示（最終レグでない場合のみ、縦のドット線を美しく描画） */}
+                              {!isLastLeg && (
+                                <div className="pl-1 py-1.5 flex items-center" style={{ display: 'flex', paddingLeft: '4px', paddingBottom: '6px', paddingTop: '3px', position: 'relative' }}>
+                                  {/* タイムラインの乗換待ち縦点線 */}
                                   <div
-                                    className="absolute left-[-21px] top-[6px] w-[10px] h-[10px] rounded-full bg-var-bg-base border-2 z-10"
+                                    className="absolute left-[-18px] top-[-10px] bottom-[2px] w-[4px]"
                                     style={{
                                       position: 'absolute',
-                                      left: '-21px',
-                                      top: '6px',
-                                      width: '10px',
-                                      height: '10px',
-                                      borderRadius: '50%',
-                                      border: '2.5px solid var(--accent)',
-                                      backgroundColor: '#121212',
-                                      zIndex: 10
+                                      left: '-18px',
+                                      top: '-10px',
+                                      bottom: '2px',
+                                      width: '4px',
+                                      borderLeft: '2px dotted #444',
+                                      zIndex: 1
                                     }}
                                   />
-                                  <div>
-                                    <div className="text-xs font-black text-white flex items-center gap-1.5" style={{ display: 'flex', alignItems: 'center' }}>
-                                      <span style={{ fontSize: '12px', fontWeight: '800' }}>{leg.to.name}</span>
-                                      {leg.to.platformCode && (
-                                        <span style={{ fontSize: '9px', backgroundColor: '#222', color: '#999', padding: '1px 4px', borderRadius: '3px', marginLeft: '4px', fontWeight: '700' }}>{leg.to.platformCode}番線</span>
-                                      )}
+                                  <div style={{ marginLeft: '12px' }}>
+                                    <div className="text-[9px] text-gray-500 font-bold" style={{ fontSize: '9px', color: '#777', fontWeight: '700' }}>
+                                      ⏱️ 乗換・待ち時間: {formatDuration(option.journey.legs[lIdx + 1].departureSecs - leg.arrivalSecs)}
                                     </div>
                                   </div>
-                                  <div className="text-[10px] font-bold text-gray-300" style={{ fontSize: '11px', fontWeight: '700' }}>{formatTime(leg.arrivalSecs)}</div>
                                 </div>
                               )}
+
                             </div>
                           );
                         })}
