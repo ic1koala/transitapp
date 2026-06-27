@@ -110,7 +110,8 @@ export const ResultsView: React.FC<ResultsViewProps> = ({
   onBack,
   onOffsetSearch
 }) => {
-  const [activeOptionId, setActiveOptionId] = useState<string>(options[0]?.id || '');
+  // デフォルトでアコーディオンを閉じるため初期状態を null に設定
+  const [activeOptionId, setActiveOptionId] = useState<string | null>(null);
   const [sortStrategy, setSortStrategy] = useState<'duration' | 'transfers' | 'fare'>('duration');
 
   const getModeIcon = (mode?: string, size = 16) => {
@@ -139,7 +140,8 @@ export const ResultsView: React.FC<ResultsViewProps> = ({
     return 0;
   });
 
-  const activeOption = sortedOptions.find(opt => opt.id === activeOptionId) || sortedOptions[0];
+  // アクティブな経路（何も選択されていない場合は null）
+  const activeOption = activeOptionId ? sortedOptions.find(opt => opt.id === activeOptionId) : null;
 
   const renderYahooBadges = (option: Option) => {
     const badges = [];
@@ -198,7 +200,7 @@ export const ResultsView: React.FC<ResultsViewProps> = ({
   };
 
   return (
-    <div className="flex flex-col flex-1 overflow-hidden" style={{ height: '100%' }}>
+    <div className="flex flex-col flex-1 overflow-hidden" style={{ height: '100%', minHeight: 0 }}>
       {/* ヘッダー */}
       <div className="header-container border-b border-gray-800 flex items-center justify-between" style={{ padding: '16px', borderBottom: '1px solid var(--border-gray)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
@@ -227,7 +229,7 @@ export const ResultsView: React.FC<ResultsViewProps> = ({
         <button
           className="flex items-center gap-1 text-xs font-bold text-white px-3 py-1.5 rounded-lg"
           style={{
-            backgroundColor: '#ffa42b', // Yahoo風オレンジ
+            backgroundColor: '#ffa42b',
             color: '#ffffff',
             border: 'none',
             borderRadius: '6px',
@@ -249,7 +251,7 @@ export const ResultsView: React.FC<ResultsViewProps> = ({
         <button
           className="flex items-center gap-1 text-xs font-bold text-white px-3 py-1.5 rounded-lg"
           style={{
-            backgroundColor: '#ffa42b', // Yahoo風オレンジ
+            backgroundColor: '#ffa42b',
             color: '#ffffff',
             border: 'none',
             borderRadius: '6px',
@@ -308,14 +310,23 @@ export const ResultsView: React.FC<ResultsViewProps> = ({
         </button>
       </div>
 
-      {/* メインスクロールビュー */}
-      <div className="flex-1 overflow-y-auto px-4 py-2" style={{ paddingBottom: '100px' }}>
-        {/* マップ */}
-        {activeOption && (
+      {/* メインスクロールビュー (Safariで確実にスクロールさせるためのフレックス高さ制御を追加) */}
+      <div
+        className="flex-1 overflow-y-auto px-4 py-2"
+        style={{
+          flex: '1 1 0%',
+          minHeight: 0,
+          overflowY: 'auto',
+          paddingBottom: '120px',
+          WebkitOverflowScrolling: 'touch' // iOS Safariでの慣性スクロール
+        }}
+      >
+        {/* マップ (アクティブな経路がある場合のみ、または常に最初の経路の地図を描画) */}
+        {(activeOption || sortedOptions[0]) && (
           <DarkMap
-            points={activeOption.map.points}
-            segments={activeOption.map.segments}
-            bounds={activeOption.map.bounds}
+            points={(activeOption || sortedOptions[0]).map.points}
+            segments={(activeOption || sortedOptions[0]).map.segments}
+            bounds={(activeOption || sortedOptions[0]).map.bounds}
           />
         )}
 
@@ -340,7 +351,7 @@ export const ResultsView: React.FC<ResultsViewProps> = ({
                   padding: '16px',
                   marginBottom: '12px'
                 }}
-                onClick={() => setActiveOptionId(option.id)}
+                onClick={() => setActiveOptionId(isActive ? null : option.id)} // タップでトグル開閉
               >
                 {/* カードヘッダー */}
                 <div className="flex justify-between items-start" style={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -386,7 +397,7 @@ export const ResultsView: React.FC<ResultsViewProps> = ({
 
                 {/* 詳細アコーディオンタイムライン */}
                 {isActive && (
-                  <div className="mt-4 pt-4 border-t border-gray-800" style={{ borderTop: '1px solid var(--border-gray)', marginTop: '16px', paddingTop: '16px' }}>
+                  <div className="mt-4 pt-4 border-t border-gray-800" style={{ borderTop: '1px solid var(--border-gray)', marginTop: '16px', paddingTop: '16px' }} onClick={(e) => e.stopPropagation()}>
                     <h4 className="text-xs font-black uppercase tracking-wider text-gray-500 mb-4" style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: '900', marginBottom: '16px' }}>経路詳細タイムライン</h4>
                     
                     <div className="relative pl-8 space-y-0" style={{ position: 'relative', paddingLeft: '32px' }}>
