@@ -21,7 +21,7 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [searchError, setSearchError] = useState<string | null>(null);
   
-  // 設定タブと連動する回避設定
+  // 回避設定 (Settings から連動)
   const [avoidModes, setAvoidModes] = useState<string[]>(() => {
     const saved = localStorage.getItem('transit_avoid_modes');
     return saved ? JSON.parse(saved) : [];
@@ -31,29 +31,56 @@ function App() {
     localStorage.setItem('transit_avoid_modes', JSON.stringify(avoidModes));
   }, [avoidModes]);
 
-  // 経路検索の実行
-  const handleSearch = async (from: Place, to: Place) => {
+  // 経路検索の実行（Yahoo乗換案内風の豊富な検索条件に対応）
+  const handleSearch = async (
+    from: Place,
+    to: Place,
+    vias: Place[],
+    searchType: 'departure' | 'arrival' | 'first' | 'last',
+    targetDate: string, // YYYYMMDD
+    targetTime: string  // HH:MM
+  ) => {
     setFromPlace(from);
     setToPlace(to);
     setLoading(true);
     setSearchError(null);
     setSearchResult(null);
 
-    const avoidParams = avoidModes.length > 0 ? `&avoidModes=${avoidModes.join(',')}` : '';
+    // 回避パラメータ
+    let queryParams = `from=${encodeURIComponent(from.endpoint)}&to=${encodeURIComponent(to.endpoint)}`;
+    
+    // 経由地
+    if (vias && vias.length > 0) {
+      vias.forEach(via => {
+        queryParams += `&via=${encodeURIComponent(via.endpoint)}`;
+      });
+    }
+
+    // 日時と検索タイプ
+    queryParams += `&type=${searchType}`;
+    if (targetDate) queryParams += `&date=${targetDate}`;
+    if (targetTime) queryParams += `&time=${targetTime}`;
+
+    // 回避交通手段
+    if (avoidModes.length > 0) {
+      queryParams += `&avoidModes=${avoidModes.join(',')}`;
+    }
 
     try {
-      const url = `https://api.transit.ls8h.com/api/v1/guidance/plan?from=${encodeURIComponent(from.endpoint)}&to=${encodeURIComponent(to.endpoint)}${avoidParams}`;
+      // /api/v1/guidance/plan からガイド付き検索プランを取得
+      const url = `https://api.transit.ls8h.com/api/v1/guidance/plan?${queryParams}`;
       const res = await fetch(url);
       
       if (!res.ok) {
-        throw new Error('経路の検索に失敗しました。時間帯や入力場所を変更して再度お試しください。');
+        throw new Error('経路の検索に失敗しました。日時や検索条件を変更して再度お試しください。');
       }
 
       const data = await res.json();
       if (!data.options || data.options.length === 0) {
-        throw new Error('指定された区間の経路が見つかりませんでした。');
+        throw new Error('指定された条件で経路が見つかりませんでした。');
       }
 
+      // オプション候補を保存
       setSearchResult(data.options);
     } catch (err: any) {
       setSearchError(err.message || '通信エラーが発生しました。');
@@ -67,13 +94,16 @@ function App() {
   const handleSelectStationFromLibrary = (station: Place) => {
     setFromPlace(station);
     setActiveTab('search');
-    // 入力フォーム側の状態は SearchTab のマウント時に引き継がれる
   };
 
   // LibraryTab からルートが選択された場合
   const handleSelectRouteFromLibrary = (from: Place, to: Place) => {
     setActiveTab('search');
-    handleSearch(from, to);
+    // 現在日時で即時検索
+    const now = new Date();
+    const targetDate = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}`;
+    const targetTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+    handleSearch(from, to, [], 'departure', targetDate, targetTime);
   };
 
   // 検索結果から戻る
@@ -97,8 +127,8 @@ function App() {
       return (
         <div className="flex-1 flex flex-col items-center justify-center text-center p-8">
           <div className="text-red-400 font-bold mb-4">⚠️ エラー</div>
-          <p className="text-sm text-gray-300 max-w-xs">{searchError}</p>
-          <button className="btn-pill btn-pill-primary mt-6" onClick={handleBackToSearch}>
+          <p className="text-sm text-gray-300 max-w-xs mb-6">{searchError}</p>
+          <button className="btn-pill btn-pill-primary" onClick={handleBackToSearch}>
             検索画面に戻る
           </button>
         </div>
@@ -118,7 +148,15 @@ function App() {
 
     switch (activeTab) {
       case 'search':
-        return <SearchTab onSearch={handleSearch} />;
+        return (
+          <SearchTab
+            onSearch={handleSearch}
+            initialFrom={fromPlace}
+            initialTo={toPlace}
+            onClearFrom={() => setFromPlace(null)}
+            onClearTo={() => setToPlace(null)}
+          />
+        );
       case 'library':
         return (
           <LibraryTab
@@ -145,7 +183,7 @@ function App() {
         {renderContent()}
       </div>
 
-      {/* 下部ナビゲーション（検索中や結果表示中は非表示にして全画面感を強調） */}
+      {/* 下部ナビゲーション */}
       {!loading && !searchResult && !searchError && (
         <div className="nav-bar">
           <button
