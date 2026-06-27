@@ -46,7 +46,7 @@ export const SearchTab: React.FC<SearchTabProps> = ({
   // 3. 日時指定アコーディオンの開閉状態 (Yahoo風)
   const [isTimePickerOpen, setIsTimePickerOpen] = useState(false);
 
-  // 4. 日時指定状態 (Yahoo風: 現在時刻 / 出発 / 到着 / 始発 / 終電)
+  // 4. 日時指定状態
   const [timeType, setTimeType] = useState<'now' | 'custom' | 'first' | 'last'>('now');
   const [searchType, setSearchType] = useState<'departure' | 'arrival' | 'first' | 'last'>('departure');
   
@@ -214,7 +214,7 @@ export const SearchTab: React.FC<SearchTabProps> = ({
     setToPlace(tempPlace);
   };
 
-  // 検索ボタンクリック (未入力時は自動サジェストで補完するYahoo親切設計)
+  // 検索ボタンクリック
   const handleSearchClick = async () => {
     let finalFrom = fromPlace;
     let finalTo = toPlace;
@@ -228,7 +228,6 @@ export const SearchTab: React.FC<SearchTabProps> = ({
       return;
     }
 
-    // 出発地がテキスト入力だけで未確定の場合、自動サジェストから補完
     if (!finalFrom) {
       try {
         const res = await fetch(`https://api.transit.ls8h.com/api/v1/places/suggest?q=${encodeURIComponent(fromInput)}&limit=1`);
@@ -246,7 +245,6 @@ export const SearchTab: React.FC<SearchTabProps> = ({
       }
     }
 
-    // 目的地も同様
     if (!finalTo) {
       try {
         const res = await fetch(`https://api.transit.ls8h.com/api/v1/places/suggest?q=${encodeURIComponent(toInput)}&limit=1`);
@@ -264,7 +262,6 @@ export const SearchTab: React.FC<SearchTabProps> = ({
       }
     }
 
-    // TypeScriptの制御フロー解析用に定数へコピー
     const fromP = finalFrom;
     const toP = finalTo;
 
@@ -273,7 +270,6 @@ export const SearchTab: React.FC<SearchTabProps> = ({
       return;
     }
 
-    // 日時・検索タイプ整形
     let apiDate = '';
     let apiTime = '';
     let apiSearchType: 'departure' | 'arrival' | 'first' | 'last' = 'departure';
@@ -297,7 +293,6 @@ export const SearchTab: React.FC<SearchTabProps> = ({
     onSearch(fromP, toP, viaPlaces, apiSearchType, apiDate, apiTime);
   };
 
-  // 1行表示用日時の文字列を作成
   const getFormattedDateTimeLabel = () => {
     if (timeType === 'now') {
       return '現在時刻 出発';
@@ -313,33 +308,43 @@ export const SearchTab: React.FC<SearchTabProps> = ({
   return (
     <div className="flex flex-col flex-1" style={{ height: '100%' }}>
       {/* 検索パネルフォーム */}
-      <div className="p-4 bg-gradient-to-b from-[#1c1c1c] to-[#121212] border-b border-gray-800 space-y-3">
-        <div className="flex items-center justify-between">
-          <h2 className="text-base font-bold text-white flex items-center gap-2">
-            <Search size={18} className="text-accent" style={{ color: 'var(--accent)' }} />
+      <div className="p-4 bg-gradient-to-b from-[#161616] to-[#0a0a0a] border-b border-gray-800 space-y-3" style={{ borderBottom: '1px solid var(--border-gray)', padding: '16px 20px' }}>
+        <div className="flex items-center justify-between" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <h2 className="text-base font-bold text-white flex items-center gap-2" style={{ fontFamily: 'var(--font-title)', letterSpacing: '-0.02em', fontSize: '18px', fontWeight: '800' }}>
+            <Search size={20} className="text-accent" style={{ color: 'var(--accent)', marginRight: '6px' }} />
             乗換案内
           </h2>
           <button
             onClick={handleAddVia}
             disabled={vias.length >= 3}
             className="text-xs btn-pill py-1 px-3 border border-gray-700 bg-transparent flex items-center gap-1"
-            style={{ border: '1px solid #4d4d4d', background: 'transparent', cursor: 'pointer' }}
+            style={{
+              border: '1px solid var(--border-gray)',
+              background: 'transparent',
+              padding: '6px 12px',
+              fontSize: '11px',
+              fontWeight: '700',
+              borderRadius: '9999px',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center'
+            }}
           >
-            <Plus size={12} />
+            <Plus size={12} style={{ marginRight: '3px' }} />
             経由駅を追加 ({vias.length}/3)
           </button>
         </div>
 
-        <div className="flex gap-2">
+        <div className="flex gap-2" style={{ display: 'flex', gap: '10px' }}>
           {/* 入力ボックス */}
-          <div className="flex-1 space-y-2">
+          <div className="flex-grow space-y-2.5" style={{ display: 'flex', flexDirection: 'column', flex: 1, gap: '8px' }}>
             {/* 出発地 */}
-            <div className="input-container">
+            <div className="input-container" style={{ position: 'relative' }}>
               <Compass className="input-icon" size={16} />
               <input
                 type="text"
                 className="input-pill"
-                style={{ paddingRight: '40px', height: '42px' }}
+                style={{ paddingRight: '42px', height: '44px' }}
                 placeholder="出発地を入力 (例: 東京)"
                 value={fromInput}
                 onChange={(e) => {
@@ -360,7 +365,8 @@ export const SearchTab: React.FC<SearchTabProps> = ({
                   top: '50%',
                   right: '16px',
                   transform: 'translateY(-50%)',
-                  cursor: 'pointer'
+                  cursor: 'pointer',
+                  display: 'flex'
                 }}
                 onClick={handleSetCurrentLocation}
                 title="現在地を設定"
@@ -371,13 +377,13 @@ export const SearchTab: React.FC<SearchTabProps> = ({
 
             {/* 経由地 (最大3つ) */}
             {vias.map((via, idx) => (
-              <div key={via.id} className="input-container flex items-center gap-2">
-                <div className="relative flex-1">
-                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[10px] text-gray-500 font-bold" style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)' }}>経由{idx + 1}</span>
+              <div key={via.id} className="input-container flex items-center gap-2" style={{ position: 'relative' }}>
+                <div className="relative flex-grow" style={{ flex: 1, position: 'relative' }}>
+                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[10px] text-gray-500 font-bold" style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', fontWeight: '900', fontSize: '10px' }}>経由{idx + 1}</span>
                   <input
                     type="text"
                     className="input-pill"
-                    style={{ paddingLeft: '50px', paddingRight: '35px', height: '42px' }}
+                    style={{ paddingLeft: '52px', paddingRight: '38px', height: '44px' }}
                     placeholder="駅名・場所を入力"
                     value={via.input}
                     onChange={(e) => handleViaInputChange(idx, e.target.value)}
@@ -389,10 +395,11 @@ export const SearchTab: React.FC<SearchTabProps> = ({
                       background: 'transparent',
                       border: 'none',
                       position: 'absolute',
-                      right: '12px',
+                      right: '14px',
                       top: '50%',
                       transform: 'translateY(-50%)',
-                      cursor: 'pointer'
+                      cursor: 'pointer',
+                      display: 'flex'
                     }}
                     onClick={() => handleRemoveVia(idx)}
                   >
@@ -403,12 +410,12 @@ export const SearchTab: React.FC<SearchTabProps> = ({
             ))}
 
             {/* 目的地 */}
-            <div className="input-container">
+            <div className="input-container" style={{ position: 'relative' }}>
               <Search className="input-icon" size={16} />
               <input
                 type="text"
                 className="input-pill"
-                style={{ height: '42px' }}
+                style={{ height: '44px' }}
                 placeholder="目的地を入力 (例: 新宿)"
                 value={toInput}
                 onChange={(e) => {
@@ -424,7 +431,7 @@ export const SearchTab: React.FC<SearchTabProps> = ({
           </div>
 
           {/* 入れ替えボタン */}
-          <div className="flex flex-col justify-center">
+          <div className="flex flex-col justify-center" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
             <button
               onClick={handleSwap}
               className="w-10 h-10 rounded-full flex items-center justify-center border border-gray-700 transition"
@@ -432,178 +439,225 @@ export const SearchTab: React.FC<SearchTabProps> = ({
                 backgroundColor: 'var(--bg-interactive)',
                 border: '1px solid var(--border-gray)',
                 borderRadius: '50%',
-                width: '40px',
-                height: '40px',
-                cursor: 'pointer'
+                width: '42px',
+                height: '42px',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: '0 4px 10px rgba(0,0,0,0.3)',
+                transition: 'all 0.2s ease'
               }}
             >
-              <ArrowLeftRight size={16} className="text-white" />
+              <ArrowLeftRight size={18} className="text-white" />
             </button>
           </div>
         </div>
 
         {/* 日時指定アコーディオンボタン (Yahoo風に1行に集約) */}
-        <div className="border-t border-gray-800 pt-2">
+        <div className="border-t border-gray-800 pt-2.5" style={{ borderTop: '1px solid var(--border-gray)', paddingTop: '10px' }}>
           <button
             onClick={() => setIsTimePickerOpen(!isTimePickerOpen)}
             className="w-full flex items-center justify-between p-2.5 rounded-lg bg-[#181818] border border-gray-800 text-xs font-bold text-gray-300 hover:bg-[#222222] transition"
             style={{
               display: 'flex',
               width: '100%',
-              backgroundColor: '#181818',
-              border: '1px solid #2a2a2a',
+              backgroundColor: '#121212',
+              border: '1px solid #1a1a1a',
               borderRadius: '8px',
-              padding: '10px 12px',
+              padding: '10px 14px',
               color: '#b3b3b3',
               justifyContent: 'space-between',
               alignItems: 'center',
-              cursor: 'pointer'
+              cursor: 'pointer',
+              transition: 'all 0.2s ease'
             }}
           >
-            <div className="flex items-center gap-2">
-              <ClockIcon size={14} className="text-accent" style={{ color: 'var(--accent)' }} />
-              <span>{getFormattedDateTimeLabel()}</span>
+            <div className="flex items-center gap-2" style={{ display: 'flex', alignItems: 'center' }}>
+              <ClockIcon size={14} className="text-accent" style={{ color: 'var(--accent)', marginRight: '8px' }} />
+              <span style={{ fontFamily: 'var(--font-title)', fontWeight: '700', fontSize: '12px' }}>{getFormattedDateTimeLabel()}</span>
             </div>
             {isTimePickerOpen ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
           </button>
 
-          {/* アコーディオン展開部分 */}
-          {isTimePickerOpen && (
-            <div className="mt-2.5 p-3 rounded-lg border border-gray-850 bg-[#151515] space-y-2.5" style={{ border: '1px solid #252525', backgroundColor: '#151515', borderRadius: '8px', padding: '12px' }}>
-              
-              {/* 時間タイプ選択タブ */}
-              <div className="flex rounded-lg overflow-hidden border border-gray-800 bg-[#121212] p-0.5 text-xs">
-                <button
-                  className="flex-1 py-1.5 text-center font-bold rounded"
-                  style={{
-                    backgroundColor: timeType === 'now' ? 'var(--bg-interactive)' : 'transparent',
-                    color: timeType === 'now' ? 'var(--accent)' : 'var(--text-muted)',
-                    border: 'none',
-                    cursor: 'pointer'
-                  }}
-                  onClick={() => setTimeType('now')}
-                >
-                  現在時刻
-                </button>
-                <button
-                  className="flex-1 py-1.5 text-center font-bold rounded"
-                  style={{
-                    backgroundColor: timeType === 'custom' ? 'var(--bg-interactive)' : 'transparent',
-                    color: timeType === 'custom' ? 'var(--accent)' : 'var(--text-muted)',
-                    border: 'none',
-                    cursor: 'pointer'
-                  }}
-                  onClick={() => {
-                    setTimeType('custom');
-                    setSearchType('departure');
-                  }}
-                >
-                  日時指定
-                </button>
-                <button
-                  className="flex-1 py-1.5 text-center font-bold rounded"
-                  style={{
-                    backgroundColor: timeType === 'first' ? 'var(--bg-interactive)' : 'transparent',
-                    color: timeType === 'first' ? 'var(--accent)' : 'var(--text-muted)',
-                    border: 'none',
-                    cursor: 'pointer'
-                  }}
-                  onClick={() => setTimeType('first')}
-                >
-                  始発
-                </button>
-                <button
-                  className="flex-1 py-1.5 text-center font-bold rounded"
-                  style={{
-                    backgroundColor: timeType === 'last' ? 'var(--bg-interactive)' : 'transparent',
-                    color: timeType === 'last' ? 'var(--accent)' : 'var(--text-muted)',
-                    border: 'none',
-                    cursor: 'pointer'
-                  }}
-                  onClick={() => setTimeType('last')}
-                >
-                  終電
-                </button>
+          {/* アコーディオン展開部分 (ヌルヌル開閉) */}
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateRows: isTimePickerOpen ? '1fr' : '0fr',
+              transition: 'grid-template-rows 300ms cubic-bezier(0.4, 0, 0.2, 1)',
+              overflow: 'hidden'
+            }}
+          >
+            <div style={{ minHeight: 0 }}>
+              <div className="mt-2.5 p-3 rounded-lg border border-gray-850 bg-[#151515] space-y-2.5" style={{ border: '1px solid #202020', backgroundColor: '#111111', borderRadius: '8px', padding: '12px', marginTop: '10px' }}>
+                
+                {/* 時間タイプ選択タブ */}
+                <div className="flex rounded-lg overflow-hidden border border-gray-800 bg-[#121212] p-0.5 text-xs" style={{ display: 'flex', border: '1px solid #222', borderRadius: '6px', backgroundColor: '#0c0c0c', padding: '2px' }}>
+                  <button
+                    className="flex-grow py-1.5 text-center font-bold rounded"
+                    style={{
+                      flex: 1,
+                      padding: '6px 0',
+                      backgroundColor: timeType === 'now' ? 'var(--bg-interactive)' : 'transparent',
+                      color: timeType === 'now' ? 'var(--accent)' : 'var(--text-muted)',
+                      border: 'none',
+                      borderRadius: '4px',
+                      cursor: 'pointer',
+                      fontWeight: '700',
+                      fontSize: '11px',
+                      transition: 'all 0.2s ease'
+                    }}
+                    onClick={() => setTimeType('now')}
+                  >
+                    現在時刻
+                  </button>
+                  <button
+                    className="flex-grow py-1.5 text-center font-bold rounded"
+                    style={{
+                      flex: 1,
+                      padding: '6px 0',
+                      backgroundColor: timeType === 'custom' ? 'var(--bg-interactive)' : 'transparent',
+                      color: timeType === 'custom' ? 'var(--accent)' : 'var(--text-muted)',
+                      border: 'none',
+                      borderRadius: '4px',
+                      cursor: 'pointer',
+                      fontWeight: '700',
+                      fontSize: '11px',
+                      transition: 'all 0.2s ease'
+                    }}
+                    onClick={() => {
+                      setTimeType('custom');
+                      setSearchType('departure');
+                    }}
+                  >
+                    日時指定
+                  </button>
+                  <button
+                    className="flex-grow py-1.5 text-center font-bold rounded"
+                    style={{
+                      flex: 1,
+                      padding: '6px 0',
+                      backgroundColor: timeType === 'first' ? 'var(--bg-interactive)' : 'transparent',
+                      color: timeType === 'first' ? 'var(--accent)' : 'var(--text-muted)',
+                      border: 'none',
+                      borderRadius: '4px',
+                      cursor: 'pointer',
+                      fontWeight: '700',
+                      fontSize: '11px',
+                      transition: 'all 0.2s ease'
+                    }}
+                    onClick={() => setTimeType('first')}
+                  >
+                    始発
+                  </button>
+                  <button
+                    className="flex-grow py-1.5 text-center font-bold rounded"
+                    style={{
+                      flex: 1,
+                      padding: '6px 0',
+                      backgroundColor: timeType === 'last' ? 'var(--bg-interactive)' : 'transparent',
+                      color: timeType === 'last' ? 'var(--accent)' : 'var(--text-muted)',
+                      border: 'none',
+                      borderRadius: '4px',
+                      cursor: 'pointer',
+                      fontWeight: '700',
+                      fontSize: '11px',
+                      transition: 'all 0.2s ease'
+                    }}
+                    onClick={() => setTimeType('last')}
+                  >
+                    終電
+                  </button>
+                </div>
+
+                {/* 詳細入力エリア */}
+                {timeType === 'custom' && (
+                  <div className="flex gap-2 text-xs" style={{ display: 'flex', gap: '8px' }}>
+                    <div className="flex-1 flex rounded-lg border border-gray-800 p-0.5 bg-[#121212]" style={{ display: 'flex', flex: 1, border: '1px solid #222', borderRadius: '6px', backgroundColor: '#0c0c0c', padding: '2px' }}>
+                      <button
+                        className="flex-1 py-1 text-center font-bold rounded"
+                        style={{
+                          flex: 1,
+                          padding: '4px 0',
+                          backgroundColor: searchType === 'departure' ? 'var(--bg-interactive)' : 'transparent',
+                          color: searchType === 'departure' ? '#ffffff' : 'var(--text-muted)',
+                          border: 'none',
+                          borderRadius: '4px',
+                          cursor: 'pointer',
+                          fontWeight: '700'
+                        }}
+                        onClick={() => setSearchType('departure')}
+                      >
+                        出発
+                      </button>
+                      <button
+                        className="flex-1 py-1 text-center font-bold rounded"
+                        style={{
+                          flex: 1,
+                          padding: '4px 0',
+                          backgroundColor: searchType === 'arrival' ? 'var(--bg-interactive)' : 'transparent',
+                          color: searchType === 'arrival' ? '#ffffff' : 'var(--text-muted)',
+                          border: 'none',
+                          borderRadius: '4px',
+                          cursor: 'pointer',
+                          fontWeight: '700'
+                        }}
+                        onClick={() => setSearchType('arrival')}
+                      >
+                        到着
+                      </button>
+                    </div>
+
+                    <div className="relative flex-1 flex items-center bg-[#1f1f1f] rounded-lg px-2 border border-gray-800" style={{ display: 'flex', flex: 1, height: '32px', border: '1px solid #222', borderRadius: '6px', backgroundColor: '#1a1a1a', padding: '0 8px', alignItems: 'center' }}>
+                      <Calendar size={12} className="text-gray-500" style={{ marginRight: '6px' }} />
+                      <input
+                        type="date"
+                        className="bg-transparent text-white w-full border-none outline-none font-bold text-[10px]"
+                        style={{ border: 'none', background: 'transparent', outline: 'none', color: '#fff', fontSize: '10px', width: '100%', fontWeight: '700' }}
+                        value={targetDate}
+                        onChange={(e) => setTargetDate(e.target.value)}
+                      />
+                    </div>
+
+                    <div className="relative flex-1 flex items-center bg-[#1f1f1f] rounded-lg px-2 border border-gray-800" style={{ display: 'flex', flex: 1, height: '32px', border: '1px solid #222', borderRadius: '6px', backgroundColor: '#1a1a1a', padding: '0 8px', alignItems: 'center' }}>
+                      <ClockIcon size={12} className="text-gray-500" style={{ marginRight: '6px' }} />
+                      <input
+                        type="time"
+                        className="bg-transparent text-white w-full border-none outline-none font-bold text-[10px]"
+                        style={{ border: 'none', background: 'transparent', outline: 'none', color: '#fff', fontSize: '10px', width: '100%', fontWeight: '700' }}
+                        value={targetTime}
+                        onChange={(e) => setTargetTime(e.target.value)}
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {/* 始発・終電時の日付入力 */}
+                {(timeType === 'first' || timeType === 'last') && (
+                  <div className="flex gap-2 text-xs" style={{ display: 'flex', gap: '8px' }}>
+                    <div className="relative flex-1 flex items-center bg-[#1f1f1f] rounded-lg px-2 border border-gray-800" style={{ display: 'flex', flex: 1, height: '32px', border: '1px solid #222', borderRadius: '6px', backgroundColor: '#1a1a1a', padding: '0 8px', alignItems: 'center' }}>
+                      <Calendar size={12} className="text-gray-500" style={{ marginRight: '6px' }} />
+                      <input
+                        type="date"
+                        className="bg-transparent text-white w-full border-none outline-none font-bold text-[10px] py-1"
+                        style={{ border: 'none', background: 'transparent', outline: 'none', color: '#fff', fontSize: '10px', width: '100%', fontWeight: '700' }}
+                        value={targetDate}
+                        onChange={(e) => setTargetDate(e.target.value)}
+                      />
+                    </div>
+                    <div className="flex-2 flex items-center justify-end text-gray-500 text-[10px]" style={{ flex: 2, display: 'flex', justifyContent: 'flex-end', alignItems: 'center', fontSize: '10px', color: '#555' }}>
+                      ※指定日の最初の便、または最終便を検索します。
+                    </div>
+                  </div>
+                )}
+
               </div>
-
-              {/* 詳細入力エリア */}
-              {timeType === 'custom' && (
-                <div className="flex gap-2 text-xs">
-                  <div className="flex-1 flex rounded-lg border border-gray-800 p-0.5 bg-[#121212]">
-                    <button
-                      className="flex-1 py-1 text-center font-bold rounded"
-                      style={{
-                        backgroundColor: searchType === 'departure' ? 'var(--bg-interactive)' : 'transparent',
-                        color: searchType === 'departure' ? '#ffffff' : 'var(--text-muted)',
-                        border: 'none',
-                        cursor: 'pointer'
-                      }}
-                      onClick={() => setSearchType('departure')}
-                    >
-                      出発
-                    </button>
-                    <button
-                      className="flex-1 py-1 text-center font-bold rounded"
-                      style={{
-                        backgroundColor: searchType === 'arrival' ? 'var(--bg-interactive)' : 'transparent',
-                        color: searchType === 'arrival' ? '#ffffff' : 'var(--text-muted)',
-                        border: 'none',
-                        cursor: 'pointer'
-                      }}
-                      onClick={() => setSearchType('arrival')}
-                    >
-                      到着
-                    </button>
-                  </div>
-
-                  <div className="relative flex-1 flex items-center bg-[#1f1f1f] rounded-lg px-2 border border-gray-800" style={{ height: '32px' }}>
-                    <Calendar size={12} className="text-gray-500 mr-1.5" style={{ marginRight: '6px' }} />
-                    <input
-                      type="date"
-                      className="bg-transparent text-white w-full border-none outline-none font-bold text-[10px]"
-                      style={{ border: 'none', background: 'transparent', outline: 'none' }}
-                      value={targetDate}
-                      onChange={(e) => setTargetDate(e.target.value)}
-                    />
-                  </div>
-
-                  <div className="relative flex-1 flex items-center bg-[#1f1f1f] rounded-lg px-2 border border-gray-800" style={{ height: '32px' }}>
-                    <ClockIcon size={12} className="text-gray-500 mr-1.5" style={{ marginRight: '6px' }} />
-                    <input
-                      type="time"
-                      className="bg-transparent text-white w-full border-none outline-none font-bold text-[10px]"
-                      style={{ border: 'none', background: 'transparent', outline: 'none' }}
-                      value={targetTime}
-                      onChange={(e) => setTargetTime(e.target.value)}
-                    />
-                  </div>
-                </div>
-              )}
-
-              {/* 始発・終電時の日付入力 */}
-              {(timeType === 'first' || timeType === 'last') && (
-                <div className="flex gap-2 text-xs">
-                  <div className="relative flex-1 flex items-center bg-[#1f1f1f] rounded-lg px-2 border border-gray-800" style={{ height: '32px' }}>
-                    <Calendar size={12} className="text-gray-500 mr-1.5" style={{ marginRight: '6px' }} />
-                    <input
-                      type="date"
-                      className="bg-transparent text-white w-full border-none outline-none font-bold text-[10px] py-1"
-                      style={{ border: 'none', background: 'transparent', outline: 'none' }}
-                      value={targetDate}
-                      onChange={(e) => setTargetDate(e.target.value)}
-                    />
-                  </div>
-                  <div className="flex-2 flex items-center justify-end text-gray-500 text-[10px]">
-                    ※指定日の最初の便、または最終便を検索します。
-                  </div>
-                </div>
-              )}
-
             </div>
-          )}
+          </div>
         </div>
 
-        {/* 大きな検索ボタン (常に表示し、SpotifyのメインCTAとしての没入感を持たせる) */}
+        {/* 大きな検索ボタン */}
         <button
           className="w-full btn-pill btn-pill-primary py-3.5 text-base font-bold tracking-wider uppercase mt-3 shadow-heavy"
           style={{
@@ -615,8 +669,10 @@ export const SearchTab: React.FC<SearchTabProps> = ({
             padding: '14px 20px',
             fontSize: '16px',
             fontWeight: '900',
+            letterSpacing: '0.05em',
             cursor: 'pointer',
-            boxShadow: 'var(--shadow-heavy)'
+            boxShadow: '0 6px 20px rgba(30, 215, 96, 0.25)',
+            transition: 'all 0.2s ease'
           }}
           onClick={handleSearchClick}
         >
@@ -625,36 +681,46 @@ export const SearchTab: React.FC<SearchTabProps> = ({
       </div>
 
       {/* サジェスト or 周辺駅リスト */}
-      <div className="flex-1 overflow-y-auto px-4 py-2" style={{ paddingBottom: '100px' }}>
+      <div className="flex-1 overflow-y-auto px-4 py-2" style={{ paddingBottom: '100px', WebkitOverflowScrolling: 'touch' }}>
         {activeInput !== null && suggests.length > 0 ? (
           /* サジェスト */
-          <div className="rounded-lg p-2 mt-2 space-y-1" style={{ backgroundColor: 'var(--bg-surface)' }}>
-            <div className="text-[10px] uppercase font-bold text-gray-500 px-3 py-1.5">検索候補</div>
+          <div className="rounded-lg p-2 mt-2 space-y-1" style={{ backgroundColor: 'var(--bg-surface)', border: '1px solid var(--border-gray)' }}>
+            <div className="text-[10px] uppercase font-bold text-gray-500 px-3 py-1.5" style={{ letterSpacing: '0.05em', fontWeight: '900' }}>検索候補</div>
             {loadingSuggest && <div className="spinner" style={{ width: '20px', height: '20px', margin: '10px auto' }} />}
             {suggests.map((place) => (
               <button
                 key={place.id}
                 className="w-full text-left px-3 py-2 rounded hover:bg-var-bg-card-hover flex items-center gap-3 transition"
-                style={{ background: 'transparent', border: 'none', width: '100%', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  width: '100%',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  padding: '8px 12px',
+                  borderRadius: '6px',
+                  transition: 'all 0.2s ease'
+                }}
                 onClick={() => handleSelectPlace(place)}
               >
-                <div className="p-1.5 rounded-full bg-[#333333] text-gray-300" style={{ padding: '6px', borderRadius: '50%', marginRight: '8px' }}>
+                <div className="p-1.5 rounded-full bg-[#252525] text-gray-300" style={{ padding: '6px', borderRadius: '50%', marginRight: '10px', display: 'flex' }}>
                   <Compass size={14} />
                 </div>
                 <div>
-                  <div className="text-sm font-bold text-white">{place.name}</div>
-                  <div className="text-xs text-gray-400">{place.description || place.kind}</div>
+                  <div className="text-sm font-bold text-white" style={{ fontSize: '13px', fontWeight: '700' }}>{place.name}</div>
+                  <div className="text-xs text-gray-400" style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{place.description || place.kind}</div>
                 </div>
               </button>
             ))}
           </div>
         ) : (
           /* 周辺駅・履歴・お気に入り */
-          <div className="space-y-6 mt-3">
+          <div className="space-y-6 mt-3.5" style={{ display: 'flex', flexDirection: 'column', gap: '28px' }}>
             {/* 周辺駅 */}
             {nearbyStations.length > 0 && (
               <div>
-                <h3 className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-3 flex items-center justify-between">
+                <h3 className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-3 flex items-center justify-between" style={{ letterSpacing: '0.05em', fontSize: '11px', fontWeight: '900', marginBottom: '12px' }}>
                   近くの駅 (現在地周辺)
                   {loadingNearby && <span className="text-xs text-accent" style={{ color: 'var(--accent)' }}>更新中...</span>}
                 </h3>
@@ -689,8 +755,8 @@ export const SearchTab: React.FC<SearchTabProps> = ({
                       }}
                     >
                       <MapPin size={18} className="card-icon" />
-                      <div className="card-title truncate">{station.name}</div>
-                      <div className="card-desc truncate">{station.description || '周辺の駅・バス停'}</div>
+                      <div className="card-title truncate" style={{ fontWeight: '700', fontSize: '13px' }}>{station.name}</div>
+                      <div className="card-desc truncate" style={{ fontSize: '10px' }}>{station.description || '周辺の駅・バス停'}</div>
                     </div>
                   ))}
                 </div>
@@ -700,22 +766,23 @@ export const SearchTab: React.FC<SearchTabProps> = ({
             {/* 履歴 */}
             {recentSearches.length > 0 && (
               <div>
-                <h3 className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-3">最近の検索</h3>
-                <div className="space-y-2">
+                <h3 className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-3" style={{ letterSpacing: '0.05em', fontSize: '11px', fontWeight: '900', marginBottom: '12px' }}>最近の検索</h3>
+                <div className="space-y-2" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                   {recentSearches.map((history, idx) => (
                     <button
                       key={idx}
-                      className="w-full flex items-center justify-between p-3 rounded-lg hover:bg-[#252525] transition text-left"
+                      className="w-full flex items-center justify-between p-3 rounded-lg hover:bg-[#1a1a1a] transition text-left"
                       style={{
                         display: 'flex',
                         width: '100%',
                         backgroundColor: 'var(--bg-surface)',
-                        border: 'none',
+                        border: '1px solid var(--border-gray)',
                         justifyContent: 'space-between',
                         alignItems: 'center',
                         cursor: 'pointer',
-                        padding: '12px',
-                        borderRadius: '8px'
+                        padding: '12px 16px',
+                        borderRadius: '10px',
+                        transition: 'all 0.2s ease'
                       }}
                       onClick={() => {
                         setFromPlace(history.from);
@@ -730,13 +797,13 @@ export const SearchTab: React.FC<SearchTabProps> = ({
                       }}
                     >
                       <div className="flex items-center gap-3" style={{ display: 'flex', alignItems: 'center' }}>
-                        <Clock size={16} className="text-gray-500" style={{ marginRight: '8px' }} />
+                        <Clock size={16} className="text-gray-500" style={{ marginRight: '10px' }} />
                         <div>
-                          <div className="text-sm font-bold text-white">{history.from.name} ➔ {history.to.name}</div>
-                          <div className="text-xs text-gray-400">乗換案内ルート</div>
+                          <div className="text-sm font-bold text-white" style={{ fontSize: '13px', fontWeight: '700' }}>{history.from.name} ➔ {history.to.name}</div>
+                          <div className="text-xs text-gray-400" style={{ fontSize: '11px', color: 'var(--text-muted)' }}>乗換案内ルート</div>
                         </div>
                       </div>
-                      <span className="text-xs text-accent font-bold" style={{ color: 'var(--accent)' }}>検索</span>
+                      <span className="text-xs text-accent font-bold" style={{ color: 'var(--accent)', fontWeight: '800' }}>検索</span>
                     </button>
                   ))}
                 </div>
@@ -746,7 +813,7 @@ export const SearchTab: React.FC<SearchTabProps> = ({
             {/* お気に入り */}
             {favoriteStations.length > 0 && (
               <div>
-                <h3 className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-3">お気に入り駅</h3>
+                <h3 className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-3" style={{ letterSpacing: '0.05em', fontSize: '11px', fontWeight: '900', marginBottom: '12px' }}>お気に入り駅</h3>
                 <div className="grid grid-cols-2 gap-3" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px' }}>
                   {favoriteStations.map((fav, idx) => (
                     <div
@@ -778,7 +845,7 @@ export const SearchTab: React.FC<SearchTabProps> = ({
                       }}
                     >
                       <Star size={18} className="card-icon" style={{ color: '#ffa42b' }} />
-                      <div className="card-title truncate">{fav.name}</div>
+                      <div className="card-title truncate" style={{ fontWeight: '700', fontSize: '13px' }}>{fav.name}</div>
                       <div className="card-desc">お気に入り駅</div>
                     </div>
                   ))}

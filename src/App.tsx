@@ -32,11 +32,11 @@ function App() {
     to: Place;
     vias: Place[];
     searchType: 'departure' | 'arrival' | 'first' | 'last';
-    date: string; // YYYYMMDD
-    time: string; // HH:MM
+    date: string;
+    time: string;
   } | null>(null);
   
-  // 回避設定 (Settings から連動)
+  // 回避設定
   const [avoidModes, setAvoidModes] = useState<string[]>(() => {
     const saved = localStorage.getItem('transit_avoid_modes');
     return saved ? JSON.parse(saved) : [];
@@ -46,14 +46,14 @@ function App() {
     localStorage.setItem('transit_avoid_modes', JSON.stringify(avoidModes));
   }, [avoidModes]);
 
-  // 経路検索の実行（Yahoo乗換案内風の豊富な検索条件に対応）
+  // 経路検索の実行
   const handleSearch = async (
     from: Place,
     to: Place,
     vias: Place[],
     searchType: 'departure' | 'arrival' | 'first' | 'last',
-    targetDate: string, // YYYYMMDD
-    targetTime: string  // HH:MM
+    targetDate: string,
+    targetTime: string
   ) => {
     setFromPlace(from);
     setToPlace(to);
@@ -61,7 +61,6 @@ function App() {
     setSearchError(null);
     setSearchResult(null);
 
-    // キャッシュ保存（1本前・1本後用）
     setSearchCache({
       from,
       to,
@@ -71,22 +70,18 @@ function App() {
       time: targetTime
     });
 
-    // 回避パラメータ
     let queryParams = `from=${encodeURIComponent(from.endpoint)}&to=${encodeURIComponent(to.endpoint)}`;
     
-    // 経由地
     if (vias && vias.length > 0) {
       vias.forEach(via => {
         queryParams += `&via=${encodeURIComponent(via.endpoint)}`;
       });
     }
 
-    // 日時と検索タイプ
     queryParams += `&type=${searchType}`;
     if (targetDate) queryParams += `&date=${targetDate}`;
     if (targetTime) queryParams += `&time=${targetTime}`;
 
-    // 回避交通手段
     if (avoidModes.length > 0) {
       queryParams += `&avoidModes=${avoidModes.join(',')}`;
     }
@@ -104,7 +99,6 @@ function App() {
         throw new Error('指定された条件で経路が見つかりませんでした。');
       }
 
-      // オプション候補を保存
       setSearchResult(data.options);
     } catch (err: any) {
       setSearchError(err.message || '通信エラーが発生しました。');
@@ -114,25 +108,20 @@ function App() {
     }
   };
 
-  // 1本前・1本後の再検索を実行する処理
   const handleOffsetSearch = (offsetMinutes: number) => {
     if (!searchCache) return;
 
-    // 現在のキャッシュ日時からDateオブジェクトを作成
     const year = parseInt(searchCache.date.substring(0, 4));
     const month = parseInt(searchCache.date.substring(4, 6)) - 1;
     const day = parseInt(searchCache.date.substring(6, 8));
     const [hours, minutes] = searchCache.time.split(':').map(Number);
 
     const currentDate = new Date(year, month, day, hours, minutes);
-    // 時間をオフセット（例: ±30分）
     currentDate.setMinutes(currentDate.getMinutes() + offsetMinutes);
 
-    // 再整形
     const newDateStr = `${currentDate.getFullYear()}${String(currentDate.getMonth() + 1).padStart(2, '0')}${String(currentDate.getDate()).padStart(2, '0')}`;
     const newTimeStr = `${String(currentDate.getHours()).padStart(2, '0')}:${String(currentDate.getMinutes()).padStart(2, '0')}`;
 
-    // 再検索
     handleSearch(
       searchCache.from,
       searchCache.to,
@@ -143,7 +132,6 @@ function App() {
     );
   };
 
-  // LibraryTab から駅が選択された場合
   const handleSelectStationFromLibrary = (station: { name: string; endpoint: string }) => {
     const place: Place = {
       id: '',
@@ -157,7 +145,6 @@ function App() {
     setActiveTab('search');
   };
 
-  // LibraryTab からルートが選択された場合
   const handleSelectRouteFromLibrary = (
     from: { name: string; endpoint: string },
     to: { name: string; endpoint: string }
@@ -188,7 +175,6 @@ function App() {
     handleSearch(fromPlaceObj, toPlaceObj, [], 'departure', targetDate, targetTime);
   };
 
-  // 検索結果から戻る
   const handleBackToSearch = () => {
     setSearchResult(null);
     setSearchError(null);
@@ -208,7 +194,7 @@ function App() {
     if (searchError) {
       return (
         <div className="flex-1 flex flex-col items-center justify-center text-center p-8">
-          <div className="text-red-400 font-bold mb-4">⚠️ エラー</div>
+          <div className="text-red-400 font-bold mb-4" style={{ fontSize: '18px' }}>⚠️ エラー</div>
           <p className="text-sm text-gray-300 max-w-xs mb-6">{searchError}</p>
           <button className="btn-pill btn-pill-primary" onClick={handleBackToSearch}>
             検索画面に戻る
@@ -260,10 +246,13 @@ function App() {
     }
   };
 
+  // 表示状態切り替え時のキーを生成し、滑らかなフェードトランジションをトリガーする
+  const animationKey = activeTab + (loading ? '_loading' : '') + (searchResult ? '_result' : '') + (searchError ? '_error' : '');
+
   return (
     <div className="app-container">
-      {/* メインビュー */}
-      <div className="main-content">
+      {/* メインビュー (アニメーションキーを付与) */}
+      <div className="main-content tab-content-active" key={animationKey}>
         {renderContent()}
       </div>
 
