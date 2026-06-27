@@ -147,8 +147,8 @@ export const ResultsView: React.FC<ResultsViewProps> = ({
       badges.push(
         <span
           key="fast"
-          className="text-[10px] font-black rounded-full w-5 h-5 flex items-center justify-center text-white"
-          style={{ backgroundColor: '#f3727f', width: '20px', height: '20px', borderRadius: '50%', fontWeight: '900' }}
+          className="text-[9px] font-black rounded-full flex items-center justify-center text-white"
+          style={{ backgroundColor: '#f3727f', width: '16px', height: '16px', borderRadius: '50%', fontWeight: '900' }}
         >
           早
         </span>
@@ -159,8 +159,8 @@ export const ResultsView: React.FC<ResultsViewProps> = ({
       badges.push(
         <span
           key="cheap"
-          className="text-[10px] font-black rounded-full w-5 h-5 flex items-center justify-center text-white"
-          style={{ backgroundColor: '#ffa42b', width: '20px', height: '20px', borderRadius: '50%', fontWeight: '900' }}
+          className="text-[9px] font-black rounded-full flex items-center justify-center text-white"
+          style={{ backgroundColor: '#ffa42b', width: '16px', height: '16px', borderRadius: '50%', fontWeight: '900' }}
         >
           安
         </span>
@@ -171,8 +171,8 @@ export const ResultsView: React.FC<ResultsViewProps> = ({
       badges.push(
         <span
           key="easy"
-          className="text-[10px] font-black rounded-full w-5 h-5 flex items-center justify-center text-white"
-          style={{ backgroundColor: '#539df5', width: '20px', height: '20px', borderRadius: '50%', fontWeight: '900' }}
+          className="text-[9px] font-black rounded-full flex items-center justify-center text-white"
+          style={{ backgroundColor: '#539df5', width: '16px', height: '16px', borderRadius: '50%', fontWeight: '900' }}
         >
           楽
         </span>
@@ -183,26 +183,26 @@ export const ResultsView: React.FC<ResultsViewProps> = ({
       badges.push(
         <span
           key="rec"
-          className="text-[9px] font-bold uppercase tracking-wider rounded-full px-2 py-0.5 text-black"
-          style={{ backgroundColor: 'var(--accent)', borderRadius: '999px', padding: '2px 8px', fontWeight: 'bold' }}
+          className="text-[8px] font-bold uppercase tracking-wider rounded-full px-1.5 py-0.5 text-black"
+          style={{ backgroundColor: 'var(--accent)', borderRadius: '999px', padding: '1px 5px', fontWeight: 'bold' }}
         >
-          おすすめ
+          推奨
         </span>
       );
     }
 
     return badges.length > 0 ? (
-      <div className="flex gap-1.5 items-center">{badges}</div>
+      <div className="flex gap-1 items-center">{badges}</div>
     ) : null;
   };
 
   return (
     <div className="flex flex-col flex-1 overflow-hidden" style={{ height: '100%', minHeight: 0 }}>
       {/* ヘッダー */}
-      <div className="header-container border-b border-gray-800 flex items-center justify-between" style={{ padding: '16px 20px', borderBottom: '1px solid var(--border-gray)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <div className="header-container border-b border-gray-800 flex items-center justify-between" style={{ padding: '12px 16px', borderBottom: '1px solid var(--border-gray)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
-          <h2 className="header-title" style={{ fontSize: '20px', fontWeight: '800', letterSpacing: '-0.02em', fontFamily: 'var(--font-title)' }}>検索結果</h2>
-          <p className="header-subtitle" style={{ fontSize: '13px', color: 'var(--text-muted)' }}>{fromName} ➔ {toName}</p>
+          <h2 className="header-title" style={{ fontSize: '17px', fontWeight: '800', letterSpacing: '-0.02em', fontFamily: 'var(--font-title)' }}>検索結果</h2>
+          <p className="header-subtitle" style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{fromName} ➔ {toName}</p>
         </div>
         <button
           className="btn-pill"
@@ -211,8 +211,8 @@ export const ResultsView: React.FC<ResultsViewProps> = ({
             color: '#ffffff',
             border: '1px solid var(--border-gray)',
             borderRadius: '9999px',
-            padding: '6px 16px',
-            fontSize: '12px',
+            padding: '5px 12px',
+            fontSize: '11px',
             fontWeight: '700',
             cursor: 'pointer',
             transition: 'all 0.2s ease'
@@ -224,30 +224,30 @@ export const ResultsView: React.FC<ResultsViewProps> = ({
       </div>
 
       {/* 1本前・1本後ナビゲーション */}
-      <div className="flex items-center justify-between px-4 py-2 border-b border-gray-850" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 20px', borderBottom: '1px solid #1a1a1a', backgroundColor: '#0d0d0d' }}>
+      <div className="flex items-center justify-between px-4 py-2 border-b border-gray-850" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 16px', borderBottom: '1px solid #1a1a1a', backgroundColor: '#0d0d0d' }}>
         <button
           className="flex items-center gap-1 text-xs font-bold text-white px-3 py-1.5 rounded-lg"
           style={{
             backgroundColor: '#ffa42b',
             color: '#ffffff',
             border: 'none',
-            borderRadius: '6px',
+            borderRadius: '5px',
             cursor: 'pointer',
-            padding: '6px 12px',
+            padding: '4px 10px',
             display: 'flex',
             alignItems: 'center',
-            fontSize: '12px',
+            fontSize: '11px',
             fontWeight: '800',
             boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
             transition: 'transform 0.1s ease'
           }}
           onClick={() => onOffsetSearch(-30)}
         >
-          <ChevronLeft size={14} />
+          <ChevronLeft size={12} />
           <span>1本前</span>
         </button>
         
-        <span className="text-xs font-bold text-gray-300 flex items-center gap-1.5" style={{ fontSize: '13px', fontWeight: '700' }}>
+        <span className="text-xs font-bold text-gray-300 flex items-center gap-1.5" style={{ fontSize: '12px', fontWeight: '700' }}>
           📅 {searchTimeLabel}
         </span>
 
@@ -257,12 +257,12 @@ export const ResultsView: React.FC<ResultsViewProps> = ({
             backgroundColor: '#ffa42b',
             color: '#ffffff',
             border: 'none',
-            borderRadius: '6px',
+            borderRadius: '5px',
             cursor: 'pointer',
-            padding: '6px 12px',
+            padding: '4px 10px',
             display: 'flex',
             alignItems: 'center',
-            fontSize: '12px',
+            fontSize: '11px',
             fontWeight: '800',
             boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
             transition: 'transform 0.1s ease'
@@ -270,21 +270,21 @@ export const ResultsView: React.FC<ResultsViewProps> = ({
           onClick={() => onOffsetSearch(30)}
         >
           <span>1本後</span>
-          <ChevronRight size={14} />
+          <ChevronRight size={12} />
         </button>
       </div>
 
       {/* ソート切り替えタブ */}
       <div className="flex border-b border-gray-800 text-xs text-center" style={{ display: 'flex', borderBottom: '1px solid #1a1a1a', backgroundColor: '#121212' }}>
         <button
-          className="flex-1 py-3.5 font-bold relative"
+          className="flex-1 py-2.5 font-bold relative"
           style={{
             background: 'transparent',
             border: 'none',
             color: sortStrategy === 'duration' ? 'var(--accent)' : 'var(--text-muted)',
-            borderBottom: sortStrategy === 'duration' ? '3px solid var(--accent)' : '3px solid transparent',
+            borderBottom: sortStrategy === 'duration' ? '2px solid var(--accent)' : '2px solid transparent',
             cursor: 'pointer',
-            fontSize: '13px',
+            fontSize: '12px',
             fontWeight: '700',
             transition: 'all 0.2s ease'
           }}
@@ -293,14 +293,14 @@ export const ResultsView: React.FC<ResultsViewProps> = ({
           時間順 (早)
         </button>
         <button
-          className="flex-1 py-3.5 font-bold relative"
+          className="flex-1 py-2.5 font-bold relative"
           style={{
             background: 'transparent',
             border: 'none',
             color: sortStrategy === 'transfers' ? 'var(--accent)' : 'var(--text-muted)',
-            borderBottom: sortStrategy === 'transfers' ? '3px solid var(--accent)' : '3px solid transparent',
+            borderBottom: sortStrategy === 'transfers' ? '2px solid var(--accent)' : '2px solid transparent',
             cursor: 'pointer',
-            fontSize: '13px',
+            fontSize: '12px',
             fontWeight: '700',
             transition: 'all 0.2s ease'
           }}
@@ -309,14 +309,14 @@ export const ResultsView: React.FC<ResultsViewProps> = ({
           回数順 (楽)
         </button>
         <button
-          className="flex-1 py-3.5 font-bold relative"
+          className="flex-1 py-2.5 font-bold relative"
           style={{
             background: 'transparent',
             border: 'none',
             color: sortStrategy === 'fare' ? 'var(--accent)' : 'var(--text-muted)',
-            borderBottom: sortStrategy === 'fare' ? '3px solid var(--accent)' : '3px solid transparent',
+            borderBottom: sortStrategy === 'fare' ? '2px solid var(--accent)' : '2px solid transparent',
             cursor: 'pointer',
-            fontSize: '13px',
+            fontSize: '12px',
             fontWeight: '700',
             transition: 'all 0.2s ease'
           }}
@@ -328,19 +328,19 @@ export const ResultsView: React.FC<ResultsViewProps> = ({
 
       {/* メインスクロールビュー */}
       <div
-        className="flex-grow overflow-y-auto px-4 py-3"
+        className="flex-grow overflow-y-auto px-3 py-2"
         style={{
           flex: '1 1 0%',
           minHeight: 0,
           overflowY: 'auto',
           paddingBottom: '120px',
           WebkitOverflowScrolling: 'touch',
-          backgroundColor: '#0a0a0a' // より深い黒で没入感アップ
+          backgroundColor: '#0a0a0a'
         }}
       >
         {/* マップ (アクティブな経路がある場合のみ、または常に最初の経路の地図を描画) */}
         {(activeOption || sortedOptions[0]) && (
-          <div style={{ borderRadius: '16px', overflow: 'hidden', border: '1px solid #1a1a1a', boxShadow: '0 8px 30px rgba(0,0,0,0.5)', marginBottom: '16px' }}>
+          <div style={{ borderRadius: '12px', overflow: 'hidden', border: '1px solid #1a1a1a', boxShadow: '0 4px 15px rgba(0,0,0,0.5)', marginBottom: '12px', height: '140px' }}>
             <DarkMap
               points={(activeOption || sortedOptions[0]).map.points}
               segments={(activeOption || sortedOptions[0]).map.segments}
@@ -349,8 +349,8 @@ export const ResultsView: React.FC<ResultsViewProps> = ({
           </div>
         )}
 
-        {/* 経路リスト */}
-        <div className="space-y-4">
+        {/* 経路リスト (縦幅を従来の40%程度にコンパクト化) */}
+        <div className="space-y-2.5">
           {sortedOptions.map((option) => {
             const isActive = option.id === activeOptionId;
             const startTime = formatTime(option.journey.departureSecs);
@@ -363,62 +363,61 @@ export const ResultsView: React.FC<ResultsViewProps> = ({
                 key={option.id}
                 className="transition-all duration-300"
                 style={{
-                  backgroundColor: isActive ? '#181818' : '#121212',
-                  border: isActive ? '1px solid var(--accent)' : '1px solid #1f1f1f',
-                  boxShadow: isActive ? '0 10px 30px rgba(30, 215, 96, 0.08)' : 'var(--shadow-medium)',
-                  borderRadius: '12px',
-                  padding: '16px',
-                  marginBottom: '14px',
+                  backgroundColor: isActive ? '#161616' : '#111111',
+                  border: isActive ? '1px solid var(--accent)' : '1px solid #1c1c1c',
+                  boxShadow: isActive ? '0 6px 20px rgba(30, 215, 96, 0.06)' : 'var(--shadow-medium)',
+                  borderRadius: '8px',
+                  padding: '10px 12px', // パディングを圧縮
+                  marginBottom: '8px',
                   cursor: 'pointer',
-                  transform: isActive ? 'scale(1.01)' : 'scale(1)'
+                  transform: isActive ? 'scale(1.005)' : 'scale(1)'
                 }}
                 onClick={() => setActiveOptionId(isActive ? null : option.id)}
               >
-                {/* カードヘッダー */}
-                <div className="flex justify-between items-start" style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <div className="space-y-1">
+                {/* カードヘッダー (コンパクト化) */}
+                <div className="flex justify-between items-center" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div className="space-y-0.5">
                     {renderYahooBadges(option)}
-                    <div className="flex items-center gap-2 mt-1.5" style={{ display: 'flex', alignItems: 'center', marginTop: '6px' }}>
-                      <span className="text-xl font-black text-white" style={{ fontSize: '22px', fontWeight: '900', letterSpacing: '-0.02em', fontFamily: 'var(--font-title)' }}>{startTime} ➔ {endTime}</span>
-                      <span className="text-xs text-accent font-bold" style={{ color: 'var(--accent)', fontWeight: '800', fontSize: '13px', marginLeft: '10px' }}>{duration}</span>
+                    <div className="flex items-center gap-1.5" style={{ display: 'flex', alignItems: 'center' }}>
+                      <span className="text-base font-black text-white" style={{ fontSize: '16px', fontWeight: '900', letterSpacing: '-0.02em', fontFamily: 'var(--font-title)' }}>{startTime} ➔ {endTime}</span>
+                      <span className="text-xs text-accent font-bold" style={{ color: 'var(--accent)', fontWeight: '800', fontSize: '11px', marginLeft: '6px' }}>{duration}</span>
                     </div>
                   </div>
                   
                   <div className="text-right" style={{ textAlign: 'right' }}>
                     {ticketFare !== undefined && (
-                      <span className="text-lg font-black text-white" style={{ fontSize: '20px', fontWeight: '900', letterSpacing: '-0.02em' }}>{ticketFare.toLocaleString()}円</span>
+                      <span className="text-base font-black text-white" style={{ fontSize: '16px', fontWeight: '900', letterSpacing: '-0.02em' }}>{ticketFare.toLocaleString()}円</span>
                     )}
-                    <div className="text-xs text-gray-400 mt-1" style={{ fontSize: '12px', color: 'var(--text-muted)' }}>乗換 {option.metrics.transferCount}回</div>
+                    <div className="text-[10px] text-gray-500" style={{ fontSize: '10px', color: 'var(--text-muted)' }}>乗換 {option.metrics.transferCount}回</div>
                   </div>
                 </div>
 
-                {/* 路線アイコンのタイムライン概要 */}
-                <div className="flex items-center gap-1.5 mt-3.5 overflow-x-auto py-1 text-xs" style={{ display: 'flex', alignItems: 'center', marginTop: '14px', overflowX: 'auto' }}>
+                {/* 路線アイコンのタイムライン概要 (コンパクト化) */}
+                <div className="flex items-center gap-1 mt-1.5 overflow-x-auto py-0.5 text-xs" style={{ display: 'flex', alignItems: 'center', marginTop: '6px', overflowX: 'auto' }}>
                   {option.journey.legs.map((leg, lIdx) => (
                     <React.Fragment key={lIdx}>
-                      {lIdx > 0 && <span className="text-gray-600 text-[10px]" style={{ margin: '0 6px', fontSize: '10px', color: '#555' }}>▶</span>}
+                      {lIdx > 0 && <span className="text-gray-700 text-[8px]" style={{ margin: '0 4px', fontSize: '8px', color: '#444' }}>▶</span>}
                       <div
-                        className="flex items-center gap-1 px-2.5 py-1 rounded-full font-bold"
+                        className="flex items-center gap-1 px-1.5 py-0.5 rounded font-bold"
                         style={{
                           backgroundColor: leg.kind === 'walk' ? 'transparent' : (leg.color || '#2c2c2c'),
                           color: leg.kind === 'walk' ? 'var(--text-muted)' : '#ffffff',
-                          border: leg.kind === 'walk' ? '1px dashed var(--border-gray)' : 'none',
-                          padding: '3px 10px',
-                          borderRadius: '999px',
+                          border: leg.kind === 'walk' ? '1px dashed #333' : 'none',
+                          padding: '1px 5px',
+                          borderRadius: '4px',
                           display: 'flex',
                           alignItems: 'center',
-                          fontSize: '11px',
-                          boxShadow: leg.kind === 'walk' ? 'none' : '0 2px 4px rgba(0,0,0,0.15)'
+                          fontSize: '10px'
                         }}
                       >
-                        {getModeIcon(leg.mode, 12)}
-                        <span className="text-[10px]" style={{ fontSize: '11px', marginLeft: '5px', fontWeight: '700' }}>{leg.kind === 'walk' ? '徒歩' : leg.routeName}</span>
+                        {getModeIcon(leg.mode, 10)}
+                        <span className="text-[9px]" style={{ fontSize: '9px', marginLeft: '3px', fontWeight: '700' }}>{leg.kind === 'walk' ? '徒歩' : leg.routeName}</span>
                       </div>
                     </React.Fragment>
                   ))}
                 </div>
 
-                {/* アコーディオン詳細タイムライン (grid-template-rows を用いたヌルヌル開閉トランジション) */}
+                {/* アコーディオン詳細タイムライン (大幅にコンパクト化) */}
                 <div
                   style={{
                     display: 'grid',
@@ -429,10 +428,10 @@ export const ResultsView: React.FC<ResultsViewProps> = ({
                   onClick={(e) => e.stopPropagation()}
                 >
                   <div style={{ minHeight: 0 }}>
-                    <div className="mt-4 pt-4 border-t border-gray-800" style={{ borderTop: '1px solid #282828', marginTop: '16px', paddingTop: '16px' }}>
-                      <h4 className="text-xs font-black uppercase tracking-wider text-gray-500 mb-4" style={{ fontSize: '12px', color: '#777', fontWeight: '900', marginBottom: '16px', letterSpacing: '0.05em' }}>経路詳細タイムライン</h4>
+                    <div className="mt-3 pt-3 border-t border-gray-800" style={{ borderTop: '1px solid #1f1f1f', marginTop: '10px', paddingTop: '10px' }}>
+                      <h4 className="text-[10px] font-black uppercase tracking-wider text-gray-600 mb-2" style={{ fontSize: '10px', color: '#555', fontWeight: '900', marginBottom: '8px', letterSpacing: '0.05em' }}>経路詳細タイムライン</h4>
                       
-                      <div className="relative pl-8 space-y-0" style={{ position: 'relative', paddingLeft: '32px' }}>
+                      <div className="relative pl-6 space-y-0" style={{ position: 'relative', paddingLeft: '24px' }}>
                         {option.journey.legs.map((leg, lIdx) => {
                           const isLastLeg = lIdx === option.journey.legs.length - 1;
                           const legDuration = formatDuration(leg.arrivalSecs - leg.departureSecs);
@@ -442,33 +441,33 @@ export const ResultsView: React.FC<ResultsViewProps> = ({
                             <div key={lIdx} className="relative" style={{ position: 'relative' }}>
                               
                               {/* 乗車駅 */}
-                              <div className="flex items-start justify-between min-h-[44px]" style={{ display: 'flex', justifyContent: 'space-between', minHeight: '44px' }}>
+                              <div className="flex items-start justify-between min-h-[26px]" style={{ display: 'flex', justifyContent: 'space-between', minHeight: '26px' }}>
                                 {/* タイムライン縦ライン */}
                                 <div
-                                  className="absolute left-[-24px] top-[10px] bottom-[-34px] w-[6px]"
+                                  className="absolute left-[-18px] top-[8px] bottom-[-22px] w-[4px]"
                                   style={{
                                     position: 'absolute',
-                                    left: '-24px',
-                                    top: '10px',
-                                    bottom: '-34px',
-                                    width: '6px',
-                                    borderLeft: leg.kind === 'walk' ? '3px dashed #444' : `6px solid ${lineCol}`,
-                                    borderRadius: '3px',
+                                    left: '-18px',
+                                    top: '8px',
+                                    bottom: '-22px',
+                                    width: '4px',
+                                    borderLeft: leg.kind === 'walk' ? '2px dashed #444' : `4px solid ${lineCol}`,
+                                    borderRadius: '2px',
                                     zIndex: 1
                                   }}
                                 />
 
                                 {/* 駅ドット */}
                                 <div
-                                  className="absolute left-[-29px] top-[4px] w-[16px] h-[16px] rounded-full bg-var-bg-base border-4 z-10"
+                                  className="absolute left-[-21px] top-[4px] w-[10px] h-[10px] rounded-full bg-var-bg-base border-2 z-10"
                                   style={{
                                     position: 'absolute',
-                                    left: '-29px',
+                                    left: '-21px',
                                     top: '4px',
-                                    width: '16px',
-                                    height: '16px',
+                                    width: '10px',
+                                    height: '10px',
                                     borderRadius: '50%',
-                                    border: '4px solid',
+                                    border: '2.5px solid',
                                     borderColor: leg.kind === 'walk' ? '#444' : (leg.color || 'var(--accent)'),
                                     backgroundColor: '#121212',
                                     zIndex: 10
@@ -476,57 +475,57 @@ export const ResultsView: React.FC<ResultsViewProps> = ({
                                 />
 
                                 <div>
-                                  <div className="text-sm font-black text-white flex items-center gap-2" style={{ display: 'flex', alignItems: 'center' }}>
-                                    <span style={{ fontSize: '14px', fontWeight: '900' }}>{leg.from.name}</span>
+                                  <div className="text-xs font-black text-white flex items-center gap-1.5" style={{ display: 'flex', alignItems: 'center' }}>
+                                    <span style={{ fontSize: '12px', fontWeight: '800' }}>{leg.from.name}</span>
                                     {leg.from.platformCode && (
-                                      <span className="text-[10px]" style={{ fontSize: '10px', backgroundColor: '#2a2a2a', color: '#b3b3b3', padding: '2px 6px', borderRadius: '4px', marginLeft: '8px', fontWeight: '700' }}>{leg.from.platformCode}番線発</span>
+                                      <span style={{ fontSize: '9px', backgroundColor: '#222', color: '#999', padding: '1px 4px', borderRadius: '3px', marginLeft: '4px', fontWeight: '700' }}>{leg.from.platformCode}番線</span>
                                     )}
                                   </div>
                                 </div>
-                                <div className="text-xs font-black text-white" style={{ fontSize: '13px', fontWeight: '900' }}>{formatTime(leg.departureSecs)}</div>
+                                <div className="text-[10px] font-bold text-gray-300" style={{ fontSize: '11px', fontWeight: '700' }}>{formatTime(leg.departureSecs)}</div>
                               </div>
 
                               {/* 移動手段・路線 */}
-                              <div className="pl-2 py-4 min-h-[50px] flex items-center justify-between" style={{ display: 'flex', justifyContent: 'space-between', paddingLeft: '8px', paddingTop: '16px', paddingBottom: '16px', minHeight: '50px' }}>
-                                <div className="flex items-center gap-2" style={{ display: 'flex', alignItems: 'center' }}>
-                                  <div className="p-1.5 rounded bg-[#2c2c2c] text-white" style={{ padding: '6px', backgroundColor: '#252525', borderRadius: '6px', display: 'flex', boxShadow: '0 2px 6px rgba(0,0,0,0.3)' }}>
-                                    {getModeIcon(leg.mode, 14)}
+                              <div className="pl-1 py-1.5 min-h-[30px] flex items-center justify-between" style={{ display: 'flex', justifyContent: 'space-between', paddingLeft: '4px', paddingTop: '3px', paddingBottom: '3px', minHeight: '30px' }}>
+                                <div className="flex items-center gap-1.5" style={{ display: 'flex', alignItems: 'center' }}>
+                                  <div className="p-1 rounded bg-[#222] text-white" style={{ padding: '3px', backgroundColor: '#202020', borderRadius: '4px', display: 'flex' }}>
+                                    {getModeIcon(leg.mode, 10)}
                                   </div>
-                                  <div className="text-xs" style={{ marginLeft: '10px' }}>
-                                    <div className="font-black text-white" style={{ fontSize: '13px', fontWeight: '900' }}>
+                                  <div style={{ marginLeft: '6px' }}>
+                                    <div className="font-bold text-gray-200" style={{ fontSize: '11px', fontWeight: '700' }}>
                                       {leg.kind === 'walk' ? '徒歩' : `${leg.routeName} ${leg.headsign ? `(${leg.headsign}行)` : ''}`}
                                     </div>
-                                    <div className="text-[10px] text-gray-500 mt-0.5" style={{ fontSize: '11px', color: '#7f7f7f' }}>所要時間: {legDuration}</div>
+                                    <div className="text-[9px] text-gray-500" style={{ fontSize: '9px', color: '#666' }}>{legDuration}</div>
                                   </div>
                                 </div>
                               </div>
 
                               {/* 降車駅（最終レグのみ） */}
                               {isLastLeg && (
-                                <div className="relative flex items-start justify-between min-h-[40px] pt-2" style={{ position: 'relative', display: 'flex', justifyContent: 'space-between', minHeight: '40px', paddingTop: '8px' }}>
+                                <div className="relative flex items-start justify-between min-h-[26px] pt-1" style={{ position: 'relative', display: 'flex', justifyContent: 'space-between', minHeight: '26px', paddingTop: '4px' }}>
                                   <div
-                                    className="absolute left-[-29px] top-[10px] w-[16px] h-[16px] rounded-full bg-var-bg-base border-4 z-10"
+                                    className="absolute left-[-21px] top-[6px] w-[10px] h-[10px] rounded-full bg-var-bg-base border-2 z-10"
                                     style={{
                                       position: 'absolute',
-                                      left: '-29px',
-                                      top: '10px',
-                                      width: '16px',
-                                      height: '16px',
+                                      left: '-21px',
+                                      top: '6px',
+                                      width: '10px',
+                                      height: '10px',
                                       borderRadius: '50%',
-                                      border: '4px solid var(--accent)',
+                                      border: '2.5px solid var(--accent)',
                                       backgroundColor: '#121212',
                                       zIndex: 10
                                     }}
                                   />
                                   <div>
-                                    <div className="text-sm font-black text-white flex items-center gap-2" style={{ display: 'flex', alignItems: 'center' }}>
-                                      <span style={{ fontSize: '14px', fontWeight: '900' }}>{leg.to.name}</span>
+                                    <div className="text-xs font-black text-white flex items-center gap-1.5" style={{ display: 'flex', alignItems: 'center' }}>
+                                      <span style={{ fontSize: '12px', fontWeight: '800' }}>{leg.to.name}</span>
                                       {leg.to.platformCode && (
-                                        <span className="text-[10px]" style={{ fontSize: '10px', backgroundColor: '#2a2a2a', color: '#b3b3b3', padding: '2px 6px', borderRadius: '4px', marginLeft: '8px', fontWeight: '700' }}>{leg.to.platformCode}番線着</span>
+                                        <span style={{ fontSize: '9px', backgroundColor: '#222', color: '#999', padding: '1px 4px', borderRadius: '3px', marginLeft: '4px', fontWeight: '700' }}>{leg.to.platformCode}番線</span>
                                       )}
                                     </div>
                                   </div>
-                                  <div className="text-xs font-black text-white" style={{ fontSize: '13px', fontWeight: '900' }}>{formatTime(leg.arrivalSecs)}</div>
+                                  <div className="text-[10px] font-bold text-gray-300" style={{ fontSize: '11px', fontWeight: '700' }}>{formatTime(leg.arrivalSecs)}</div>
                                 </div>
                               )}
                             </div>
@@ -538,8 +537,8 @@ export const ResultsView: React.FC<ResultsViewProps> = ({
                 </div>
                 
                 {/* 矢印 */}
-                <div className="flex justify-center mt-2 text-gray-600" style={{ display: 'flex', justifyContent: 'center', marginTop: '10px', color: '#4d4d4d' }}>
-                  {isActive ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                <div className="flex justify-center mt-1 text-gray-700" style={{ display: 'flex', justifyContent: 'center', marginTop: '6px', color: '#333' }}>
+                  {isActive ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
                 </div>
               </div>
             );

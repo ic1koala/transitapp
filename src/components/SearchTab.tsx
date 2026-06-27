@@ -33,20 +33,15 @@ export const SearchTab: React.FC<SearchTabProps> = ({
   onClearFrom,
   onClearTo
 }) => {
-  // 1. 出発地・目的地
   const [fromInput, setFromInput] = useState(initialFrom?.name || '');
   const [fromPlace, setFromPlace] = useState<Place | null>(initialFrom ? { ...initialFrom, id: '', kind: 'station', lat: 0, lon: 0 } : null);
   
   const [toInput, setToInput] = useState(initialTo?.name || '');
   const [toPlace, setToPlace] = useState<Place | null>(initialTo ? { ...initialTo, id: '', kind: 'station', lat: 0, lon: 0 } : null);
 
-  // 2. 経由地 (最大3つ)
   const [vias, setVias] = useState<{ id: string; input: string; place: Place | null }[]>([]);
 
-  // 3. 日時指定アコーディオンの開閉状態 (Yahoo風)
   const [isTimePickerOpen, setIsTimePickerOpen] = useState(false);
-
-  // 4. 日時指定状態
   const [timeType, setTimeType] = useState<'now' | 'custom' | 'first' | 'last'>('now');
   const [searchType, setSearchType] = useState<'departure' | 'arrival' | 'first' | 'last'>('departure');
   
@@ -66,18 +61,18 @@ export const SearchTab: React.FC<SearchTabProps> = ({
   const [targetDate, setTargetDate] = useState(getTodayString(new Date()));
   const [targetTime, setTargetTime] = useState(getTimeString(new Date()));
 
-  // 5. サジェスト関連
+  // サジェスト関連
   const [suggests, setSuggests] = useState<Place[]>([]);
   const [activeInput, setActiveInput] = useState<'from' | 'to' | number | null>(null);
   const [loadingSuggest, setLoadingSuggest] = useState(false);
 
-  // 6. 周辺駅・履歴・お気に入り
+  // 周辺駅・履歴・お気に入り
   const [nearbyStations, setNearbyStations] = useState<Place[]>([]);
   const [loadingNearby, setLoadingNearby] = useState(false);
   const [recentSearches, setRecentSearches] = useState<{ from: Place; to: Place }[]>([]);
   const [favoriteStations, setFavoriteStations] = useState<Place[]>([]);
 
-  // 初期値の同期
+  // 初期値同期
   useEffect(() => {
     if (initialFrom) {
       setFromPlace({ ...initialFrom, id: '', kind: 'station', lat: 0, lon: 0 });
@@ -89,7 +84,7 @@ export const SearchTab: React.FC<SearchTabProps> = ({
     }
   }, [initialFrom, initialTo]);
 
-  // 初期読み込み
+  // 初期データ読み込み
   useEffect(() => {
     const history = localStorage.getItem('transit_history');
     if (history) setRecentSearches(JSON.parse(history));
@@ -156,7 +151,7 @@ export const SearchTab: React.FC<SearchTabProps> = ({
     );
   };
 
-  // 現在地を設定
+  // 現在地設定
   const handleSetCurrentLocation = () => {
     if (!navigator.geolocation) return;
     navigator.geolocation.getCurrentPosition((pos) => {
@@ -305,10 +300,69 @@ export const SearchTab: React.FC<SearchTabProps> = ({
     return `${m}月${d}日 ${targetTime} ${typeLabel}`;
   };
 
+  // 入力欄の真下にドロップダウンでサジェストを表示するレンダラー
+  const renderSuggestDropdown = (type: 'from' | 'to' | number) => {
+    if (activeInput !== type || suggests.length === 0) return null;
+    return (
+      <div
+        className="suggest-dropdown-menu"
+        style={{
+          position: 'absolute',
+          top: '100%',
+          left: 0,
+          width: '100%',
+          maxHeight: '220px',
+          overflowY: 'auto',
+          backgroundColor: '#1c1c1c',
+          border: '1px solid #2a2a2a',
+          borderRadius: '8px',
+          zIndex: 1000,
+          boxShadow: '0 10px 25px rgba(0,0,0,0.6)',
+          marginTop: '4px',
+          display: 'flex',
+          flexDirection: 'column',
+          padding: '4px'
+        }}
+      >
+        {loadingSuggest && <div className="spinner" style={{ width: '16px', height: '16px', margin: '8px auto' }} />}
+        {suggests.map((place) => (
+          <button
+            key={place.id}
+            style={{
+              background: 'transparent',
+              border: 'none',
+              width: '100%',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              padding: '8px 10px',
+              borderRadius: '6px',
+              color: '#ffffff',
+              textAlign: 'left',
+              fontFamily: 'var(--font-ui)',
+              fontSize: '13px'
+            }}
+            onMouseDown={(e) => {
+              // inputのonBlurによるドロップダウン消失を防ぐため、onMouseDownを使用
+              e.preventDefault();
+              handleSelectPlace(place);
+            }}
+          >
+            <Compass size={14} className="text-gray-400" style={{ marginRight: '8px' }} />
+            <div>
+              <div style={{ fontWeight: '700' }}>{place.name}</div>
+              <div style={{ fontSize: '10px', color: 'var(--text-muted)' }}>{place.description || place.kind}</div>
+            </div>
+          </button>
+        ))}
+      </div>
+    );
+  };
+
   return (
     <div className="flex flex-col flex-1" style={{ height: '100%' }}>
       {/* 検索パネルフォーム */}
-      <div className="p-4 bg-gradient-to-b from-[#161616] to-[#0a0a0a] border-b border-gray-800 space-y-3" style={{ borderBottom: '1px solid var(--border-gray)', padding: '16px 20px' }}>
+      <div className="p-4 bg-gradient-to-b from-[#161616] to-[#0a0a0a] border-b border-gray-800 space-y-3" style={{ borderBottom: '1px solid var(--border-gray)', padding: '16px 20px', zIndex: 100 }}>
         <div className="flex items-center justify-between" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <h2 className="text-base font-bold text-white flex items-center gap-2" style={{ fontFamily: 'var(--font-title)', letterSpacing: '-0.02em', fontSize: '18px', fontWeight: '800' }}>
             <Search size={20} className="text-accent" style={{ color: 'var(--accent)', marginRight: '6px' }} />
@@ -355,6 +409,7 @@ export const SearchTab: React.FC<SearchTabProps> = ({
                   }
                 }}
                 onFocus={() => setActiveInput('from')}
+                onBlur={() => setTimeout(() => setActiveInput(null), 200)}
               />
               <button
                 className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-white"
@@ -373,11 +428,13 @@ export const SearchTab: React.FC<SearchTabProps> = ({
               >
                 <MapPin size={16} className="text-accent" style={{ color: 'var(--accent)' }} />
               </button>
+              {/* 真下のドロップダウン表示 */}
+              {renderSuggestDropdown('from')}
             </div>
 
             {/* 経由地 (最大3つ) */}
             {vias.map((via, idx) => (
-              <div key={via.id} className="input-container flex items-center gap-2" style={{ position: 'relative' }}>
+              <div key={via.id} className="input-container flex items-center gap-2" style={{ position: 'relative', zIndex: 90 - idx }}>
                 <div className="relative flex-grow" style={{ flex: 1, position: 'relative' }}>
                   <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[10px] text-gray-500 font-bold" style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', fontWeight: '900', fontSize: '10px' }}>経由{idx + 1}</span>
                   <input
@@ -388,6 +445,7 @@ export const SearchTab: React.FC<SearchTabProps> = ({
                     value={via.input}
                     onChange={(e) => handleViaInputChange(idx, e.target.value)}
                     onFocus={() => setActiveInput(idx)}
+                    onBlur={() => setTimeout(() => setActiveInput(null), 200)}
                   />
                   <button
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-red-400"
@@ -405,12 +463,14 @@ export const SearchTab: React.FC<SearchTabProps> = ({
                   >
                     <Trash2 size={14} />
                   </button>
+                  {/* 真下のドロップダウン表示 */}
+                  {renderSuggestDropdown(idx)}
                 </div>
               </div>
             ))}
 
             {/* 目的地 */}
-            <div className="input-container" style={{ position: 'relative' }}>
+            <div className="input-container" style={{ position: 'relative', zIndex: 50 }}>
               <Search className="input-icon" size={16} />
               <input
                 type="text"
@@ -426,12 +486,15 @@ export const SearchTab: React.FC<SearchTabProps> = ({
                   }
                 }}
                 onFocus={() => setActiveInput('to')}
+                onBlur={() => setTimeout(() => setActiveInput(null), 200)}
               />
+              {/* 真下のドロップダウン表示 */}
+              {renderSuggestDropdown('to')}
             </div>
           </div>
 
           {/* 入れ替えボタン */}
-          <div className="flex flex-col justify-center" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+          <div className="flex flex-col justify-center" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', zIndex: 110 }}>
             <button
               onClick={handleSwap}
               className="w-10 h-10 rounded-full flex items-center justify-center border border-gray-700 transition"
@@ -454,7 +517,7 @@ export const SearchTab: React.FC<SearchTabProps> = ({
           </div>
         </div>
 
-        {/* 日時指定アコーディオンボタン (Yahoo風に1行に集約) */}
+        {/* 日時指定アコーディオンボタン */}
         <div className="border-t border-gray-800 pt-2.5" style={{ borderTop: '1px solid var(--border-gray)', paddingTop: '10px' }}>
           <button
             onClick={() => setIsTimePickerOpen(!isTimePickerOpen)}
@@ -620,7 +683,7 @@ export const SearchTab: React.FC<SearchTabProps> = ({
                       />
                     </div>
 
-                    <div className="relative flex-1 flex items-center bg-[#1f1f1f] rounded-lg px-2 border border-gray-800" style={{ display: 'flex', flex: 1, height: '32px', border: '1px solid #222', borderRadius: '6px', backgroundColor: '#1a1a1a', padding: '0 8px', alignItems: 'center' }}>
+                    <div className="relative flex-1 flex items-center bg-[#1f1f1f] rounded-lg px-2 border border-gray-850" style={{ display: 'flex', flex: 1, height: '32px', border: '1px solid #222', borderRadius: '6px', backgroundColor: '#1a1a1a', padding: '0 8px', alignItems: 'center' }}>
                       <ClockIcon size={12} className="text-gray-500" style={{ marginRight: '6px' }} />
                       <input
                         type="time"
@@ -680,180 +743,145 @@ export const SearchTab: React.FC<SearchTabProps> = ({
         </button>
       </div>
 
-      {/* サジェスト or 周辺駅リスト */}
+      {/* 周辺駅・履歴・お気に入り (常に下部に表示し、入力中はサジェストが上にかぶさる) */}
       <div className="flex-1 overflow-y-auto px-4 py-2" style={{ paddingBottom: '100px', WebkitOverflowScrolling: 'touch' }}>
-        {activeInput !== null && suggests.length > 0 ? (
-          /* サジェスト */
-          <div className="rounded-lg p-2 mt-2 space-y-1" style={{ backgroundColor: 'var(--bg-surface)', border: '1px solid var(--border-gray)' }}>
-            <div className="text-[10px] uppercase font-bold text-gray-500 px-3 py-1.5" style={{ letterSpacing: '0.05em', fontWeight: '900' }}>検索候補</div>
-            {loadingSuggest && <div className="spinner" style={{ width: '20px', height: '20px', margin: '10px auto' }} />}
-            {suggests.map((place) => (
-              <button
-                key={place.id}
-                className="w-full text-left px-3 py-2 rounded hover:bg-var-bg-card-hover flex items-center gap-3 transition"
-                style={{
-                  background: 'transparent',
-                  border: 'none',
-                  width: '100%',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  padding: '8px 12px',
-                  borderRadius: '6px',
-                  transition: 'all 0.2s ease'
-                }}
-                onClick={() => handleSelectPlace(place)}
-              >
-                <div className="p-1.5 rounded-full bg-[#252525] text-gray-300" style={{ padding: '6px', borderRadius: '50%', marginRight: '10px', display: 'flex' }}>
-                  <Compass size={14} />
-                </div>
-                <div>
-                  <div className="text-sm font-bold text-white" style={{ fontSize: '13px', fontWeight: '700' }}>{place.name}</div>
-                  <div className="text-xs text-gray-400" style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{place.description || place.kind}</div>
-                </div>
-              </button>
-            ))}
-          </div>
-        ) : (
-          /* 周辺駅・履歴・お気に入り */
-          <div className="space-y-6 mt-3.5" style={{ display: 'flex', flexDirection: 'column', gap: '28px' }}>
-            {/* 周辺駅 */}
-            {nearbyStations.length > 0 && (
-              <div>
-                <h3 className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-3 flex items-center justify-between" style={{ letterSpacing: '0.05em', fontSize: '11px', fontWeight: '900', marginBottom: '12px' }}>
-                  近くの駅 (現在地周辺)
-                  {loadingNearby && <span className="text-xs text-accent" style={{ color: 'var(--accent)' }}>更新中...</span>}
-                </h3>
-                <div className="grid grid-cols-2 gap-3" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px' }}>
-                  {nearbyStations.map((station) => (
-                    <div
-                      key={station.id}
-                      className="card-item"
-                      onClick={() => {
-                        if (activeInput === 'from') {
+        <div className="space-y-6 mt-3.5" style={{ display: 'flex', flexDirection: 'column', gap: '28px' }}>
+          {/* 周辺駅 */}
+          {nearbyStations.length > 0 && (
+            <div>
+              <h3 className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-3 flex items-center justify-between" style={{ letterSpacing: '0.05em', fontSize: '11px', fontWeight: '900', marginBottom: '12px' }}>
+                近くの駅 (現在地周辺)
+                {loadingNearby && <span className="text-xs text-accent" style={{ color: 'var(--accent)' }}>更新中...</span>}
+              </h3>
+              <div className="grid grid-cols-2 gap-3" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px' }}>
+                {nearbyStations.map((station) => (
+                  <div
+                    key={station.id}
+                    className="card-item"
+                    onClick={() => {
+                      if (activeInput === 'from') {
+                        setFromPlace(station);
+                        setFromInput(station.name);
+                        setActiveInput(null);
+                      } else if (activeInput === 'to') {
+                        setToPlace(station);
+                        setToInput(station.name);
+                        setActiveInput(null);
+                      } else if (typeof activeInput === 'number') {
+                        const updated = [...vias];
+                        updated[activeInput] = { ...updated[activeInput], input: station.name, place: station };
+                        setVias(updated);
+                        setActiveInput(null);
+                      } else {
+                        if (!fromPlace) {
                           setFromPlace(station);
                           setFromInput(station.name);
-                          setActiveInput(null);
-                        } else if (activeInput === 'to') {
+                        } else {
                           setToPlace(station);
                           setToInput(station.name);
-                          setActiveInput(null);
-                        } else if (typeof activeInput === 'number') {
-                          const updated = [...vias];
-                          updated[activeInput] = { ...updated[activeInput], input: station.name, place: station };
-                          setVias(updated);
-                          setActiveInput(null);
-                        } else {
-                          if (!fromPlace) {
-                            setFromPlace(station);
-                            setFromInput(station.name);
-                          } else {
-                            setToPlace(station);
-                            setToInput(station.name);
-                          }
                         }
-                      }}
-                    >
-                      <MapPin size={18} className="card-icon" />
-                      <div className="card-title truncate" style={{ fontWeight: '700', fontSize: '13px' }}>{station.name}</div>
-                      <div className="card-desc truncate" style={{ fontSize: '10px' }}>{station.description || '周辺の駅・バス停'}</div>
-                    </div>
-                  ))}
-                </div>
+                      }
+                    }}
+                  >
+                    <MapPin size={18} className="card-icon" />
+                    <div className="card-title truncate" style={{ fontWeight: '700', fontSize: '13px' }}>{station.name}</div>
+                    <div className="card-desc truncate" style={{ fontSize: '10px' }}>{station.description || '周辺の駅・バス停'}</div>
+                  </div>
+                ))}
               </div>
-            )}
+            </div>
+          )}
 
-            {/* 履歴 */}
-            {recentSearches.length > 0 && (
-              <div>
-                <h3 className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-3" style={{ letterSpacing: '0.05em', fontSize: '11px', fontWeight: '900', marginBottom: '12px' }}>最近の検索</h3>
-                <div className="space-y-2" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  {recentSearches.map((history, idx) => (
-                    <button
-                      key={idx}
-                      className="w-full flex items-center justify-between p-3 rounded-lg hover:bg-[#1a1a1a] transition text-left"
-                      style={{
-                        display: 'flex',
-                        width: '100%',
-                        backgroundColor: 'var(--bg-surface)',
-                        border: '1px solid var(--border-gray)',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        cursor: 'pointer',
-                        padding: '12px 16px',
-                        borderRadius: '10px',
-                        transition: 'all 0.2s ease'
-                      }}
-                      onClick={() => {
-                        setFromPlace(history.from);
-                        setFromInput(history.from.name);
-                        setToPlace(history.to);
-                        setToInput(history.to.name);
-                        
-                        const now = new Date();
-                        const targetDateStr = getTodayString(now).replace(/-/g, '');
-                        const targetTimeStr = getTimeString(now);
-                        onSearch(history.from, history.to, [], 'departure', targetDateStr, targetTimeStr);
-                      }}
-                    >
-                      <div className="flex items-center gap-3" style={{ display: 'flex', alignItems: 'center' }}>
-                        <Clock size={16} className="text-gray-500" style={{ marginRight: '10px' }} />
-                        <div>
-                          <div className="text-sm font-bold text-white" style={{ fontSize: '13px', fontWeight: '700' }}>{history.from.name} ➔ {history.to.name}</div>
-                          <div className="text-xs text-gray-400" style={{ fontSize: '11px', color: 'var(--text-muted)' }}>乗換案内ルート</div>
-                        </div>
+          {/* 履歴 */}
+          {recentSearches.length > 0 && (
+            <div>
+              <h3 className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-3" style={{ letterSpacing: '0.05em', fontSize: '11px', fontWeight: '900', marginBottom: '12px' }}>最近の検索</h3>
+              <div className="space-y-2" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                {recentSearches.map((history, idx) => (
+                  <button
+                    key={idx}
+                    className="w-full flex items-center justify-between p-3 rounded-lg hover:bg-[#1a1a1a] transition text-left"
+                    style={{
+                      display: 'flex',
+                      width: '100%',
+                      backgroundColor: 'var(--bg-surface)',
+                      border: '1px solid var(--border-gray)',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      cursor: 'pointer',
+                      padding: '12px 16px',
+                      borderRadius: '10px',
+                      transition: 'all 0.2s ease'
+                    }}
+                    onClick={() => {
+                      setFromPlace(history.from);
+                      setFromInput(history.from.name);
+                      setToPlace(history.to);
+                      setToInput(history.to.name);
+                      
+                      const now = new Date();
+                      const targetDateStr = getTodayString(now).replace(/-/g, '');
+                      const targetTimeStr = getTimeString(now);
+                      onSearch(history.from, history.to, [], 'departure', targetDateStr, targetTimeStr);
+                    }}
+                  >
+                    <div className="flex items-center gap-3" style={{ display: 'flex', alignItems: 'center' }}>
+                      <Clock size={16} className="text-gray-500" style={{ marginRight: '10px' }} />
+                      <div>
+                        <div className="text-sm font-bold text-white" style={{ fontSize: '13px', fontWeight: '700' }}>{history.from.name} ➔ {history.to.name}</div>
+                        <div className="text-xs text-gray-400" style={{ fontSize: '11px', color: 'var(--text-muted)' }}>乗換案内ルート</div>
                       </div>
-                      <span className="text-xs text-accent font-bold" style={{ color: 'var(--accent)', fontWeight: '800' }}>検索</span>
-                    </button>
-                  ))}
-                </div>
+                    </div>
+                    <span className="text-xs text-accent font-bold" style={{ color: 'var(--accent)', fontWeight: '800' }}>検索</span>
+                  </button>
+                ))}
               </div>
-            )}
+            </div>
+          )}
 
-            {/* お気に入り */}
-            {favoriteStations.length > 0 && (
-              <div>
-                <h3 className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-3" style={{ letterSpacing: '0.05em', fontSize: '11px', fontWeight: '900', marginBottom: '12px' }}>お気に入り駅</h3>
-                <div className="grid grid-cols-2 gap-3" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px' }}>
-                  {favoriteStations.map((fav, idx) => (
-                    <div
-                      key={idx}
-                      className="card-item"
-                      onClick={() => {
-                        if (activeInput === 'from') {
+          {/* お気に入り */}
+          {favoriteStations.length > 0 && (
+            <div>
+              <h3 className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-3" style={{ letterSpacing: '0.05em', fontSize: '11px', fontWeight: '900', marginBottom: '12px' }}>お気に入り駅</h3>
+              <div className="grid grid-cols-2 gap-3" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px' }}>
+                {favoriteStations.map((fav, idx) => (
+                  <div
+                    key={idx}
+                    className="card-item"
+                    onClick={() => {
+                      if (activeInput === 'from') {
+                        setFromPlace(fav);
+                        setFromInput(fav.name);
+                        setActiveInput(null);
+                      } else if (activeInput === 'to') {
+                        setToPlace(fav);
+                        setToInput(fav.name);
+                        setActiveInput(null);
+                      } else if (typeof activeInput === 'number') {
+                        const updated = [...vias];
+                        updated[activeInput] = { ...updated[activeInput], input: fav.name, place: fav };
+                        setVias(updated);
+                        setActiveInput(null);
+                      } else {
+                        if (!fromPlace) {
                           setFromPlace(fav);
                           setFromInput(fav.name);
-                          setActiveInput(null);
-                        } else if (activeInput === 'to') {
+                        } else {
                           setToPlace(fav);
                           setToInput(fav.name);
-                          setActiveInput(null);
-                        } else if (typeof activeInput === 'number') {
-                          const updated = [...vias];
-                          updated[activeInput] = { ...updated[activeInput], input: fav.name, place: fav };
-                          setVias(updated);
-                          setActiveInput(null);
-                        } else {
-                          if (!fromPlace) {
-                            setFromPlace(fav);
-                            setFromInput(fav.name);
-                          } else {
-                            setToPlace(fav);
-                            setToInput(fav.name);
-                          }
                         }
-                      }}
-                    >
-                      <Star size={18} className="card-icon" style={{ color: '#ffa42b' }} />
-                      <div className="card-title truncate" style={{ fontWeight: '700', fontSize: '13px' }}>{fav.name}</div>
-                      <div className="card-desc">お気に入り駅</div>
-                    </div>
-                  ))}
-                </div>
+                      }
+                    }}
+                  >
+                    <Star size={18} className="card-icon" style={{ color: '#ffa42b' }} />
+                    <div className="card-title truncate" style={{ fontWeight: '700', fontSize: '13px' }}>{fav.name}</div>
+                    <div className="card-desc">お気に入り駅</div>
+                  </div>
+                ))}
               </div>
-            )}
-          </div>
-        )}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
