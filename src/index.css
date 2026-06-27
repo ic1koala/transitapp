@@ -1,26 +1,25 @@
 :root {
-  --bg-base: #121212;
-  --bg-surface: #181818;
-  --bg-interactive: #1f1f1f;
-  --bg-card: #252525;
-  --bg-card-hover: #2a2a2a;
+  --bg-base: #0a0a0a;       /* 漆黒ベース */
+  --bg-surface: #121212;    /* カード背景 */
+  --bg-interactive: #1a1a1a;/* インプット・インタラクティブ背景 */
+  --bg-card: #181818;       /* 展開されたカード背景 */
+  --bg-card-hover: #222222;  /* ホバー・アクティブ時の背景 */
   
-  --accent: #1ed760;
+  --accent: #1ed760;        /* Spotify Green */
   --accent-hover: #1fdf64;
   
   --text-base: #ffffff;
-  --text-muted: #b3b3b3;
+  --text-muted: #b3b3b3;    /* Silver */
   --text-bright: #fdfdfd;
   
-  --border-gray: #4d4d4d;
-  --border-muted: #2a2a2a;
+  --border-gray: #282828;   /* 極薄ボーダー */
+  --border-muted: #161616;
   
-  --shadow-heavy: rgba(0, 0, 0, 0.5) 0px 8px 24px;
-  --shadow-medium: rgba(0, 0, 0, 0.3) 0px 8px 8px;
-  --shadow-inset: rgb(18, 18, 18) 0px 1px 0px, rgb(124, 124, 124) 0px 0px 0px 1px inset;
-
-  --font-ui: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Meiryo", sans-serif;
-  --font-title: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Meiryo", sans-serif;
+  --shadow-heavy: rgba(0, 0, 0, 0.6) 0px 12px 32px;
+  --shadow-medium: rgba(0, 0, 0, 0.4) 0px 8px 16px;
+  
+  --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-title: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 * {
@@ -40,6 +39,7 @@ body, html {
   position: fixed;
   top: 0;
   left: 0;
+  letter-spacing: -0.01em;
 }
 
 #root {
@@ -51,40 +51,42 @@ body, html {
 
 /* スクロールバーの非表示（Spotify風） */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 4px;
+  height: 4px;
 }
 ::-webkit-scrollbar-track {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
   background: #3e3e3e;
-  border-radius: 3px;
+  border-radius: 2px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #5a5a5a;
+  background: #555555;
 }
 
-/* アプリレイアウト */
+/* アプリコンテナ */
 .app-container {
   display: flex;
   flex-direction: column;
   height: 100vh;
   width: 100%;
-  max-width: 450px; /* iPhone 15 Pro Max 幅に制限（PC閲覧時など） */
+  max-width: 450px;
   margin: 0 auto;
   background-color: var(--bg-base);
   position: relative;
   box-shadow: var(--shadow-heavy);
+  border-left: 1px solid #111;
+  border-right: 1px solid #111;
 }
 
 .main-content {
   flex: 1;
-  overflow-y: auto;
-  padding-bottom: calc(75px + env(safe-area-inset-bottom)); /* ナビバーの高さ + セーフエリア */
-  padding-top: env(safe-area-inset-top);
+  overflow: hidden;
   display: flex;
   flex-direction: column;
+  padding-bottom: calc(65px + env(safe-area-inset-bottom));
+  padding-top: env(safe-area-inset-top);
 }
 
 /* 底部ナビゲーション */
@@ -94,7 +96,9 @@ body, html {
   left: 0;
   width: 100%;
   height: calc(65px + env(safe-area-inset-bottom));
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.95), rgba(18, 18, 18, 0.95));
+  background: rgba(10, 10, 10, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   border-top: 1px solid var(--border-muted);
   display: flex;
   justify-content: space-around;
@@ -112,23 +116,29 @@ body, html {
   color: var(--text-muted);
   font-family: var(--font-ui);
   font-size: 11px;
+  font-weight: 500;
   cursor: pointer;
   width: 33.33%;
   height: 100%;
   justify-content: center;
-  transition: color 0.2s, transform 0.1s;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .nav-item.active {
   color: var(--text-base);
+  font-weight: 700;
 }
 
 .nav-item:active {
-  transform: scale(0.95);
+  transform: scale(0.92);
 }
 
 .nav-item svg {
-  margin-bottom: 4px;
+  margin-bottom: 5px;
+  transition: transform 0.2s ease;
+}
+.nav-item.active svg {
+  transform: scale(1.08);
 }
 
 /* 共通 UI コンポーネント */
@@ -139,39 +149,45 @@ body, html {
   color: var(--text-base);
   border: 1px solid var(--border-gray);
   border-radius: 9999px;
-  padding: 8px 16px;
-  font-size: 14px;
+  padding: 8px 18px;
+  font-size: 13px;
   font-weight: 700;
+  font-family: var(--font-ui);
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  transition: background-color 0.2s, transform 0.1s;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .btn-pill:hover {
   background-color: var(--bg-card-hover);
+  border-color: #555;
+  transform: translateY(-1px);
 }
 
 .btn-pill:active {
-  transform: scale(0.95);
+  transform: scale(0.96) translateY(0);
 }
 
 .btn-pill-primary {
   background-color: var(--accent);
   color: #000000;
   border: none;
+  font-weight: 900;
 }
 
 .btn-pill-primary:hover {
   background-color: var(--accent-hover);
+  box-shadow: 0 4px 15px rgba(30, 215, 96, 0.3);
 }
 
 /* 丸形ボタン */
 .btn-circle {
-  width: 48px;
-  height: 48px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   background-color: var(--accent);
   border: none;
@@ -181,34 +197,38 @@ body, html {
   justify-content: center;
   cursor: pointer;
   box-shadow: var(--shadow-heavy);
-  transition: transform 0.2s, background-color 0.2s;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .btn-circle:hover {
-  transform: scale(1.05);
+  transform: scale(1.06);
   background-color: var(--accent-hover);
 }
 
 .btn-circle:active {
-  transform: scale(0.95);
+  transform: scale(0.94);
 }
 
 /* Spotify風の入力フォーム */
 .input-pill {
   width: 100%;
   background-color: var(--bg-interactive);
-  border: 1px solid var(--border-gray);
-  border-radius: 500px;
-  padding: 12px 16px 12px 40px; /* 左側にアイコン用の余白 */
+  border: 1px solid transparent;
+  border-radius: 9999px;
+  padding: 12px 16px 12px 42px;
   color: var(--text-base);
   font-size: 14px;
+  font-weight: 500;
   font-family: var(--font-ui);
   outline: none;
-  transition: border-color 0.2s;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .input-pill:focus {
-  border-color: var(--text-base);
+  border-color: var(--accent);
+  background-color: var(--bg-surface);
+  box-shadow: 0 0 0 1px var(--accent), inset 0 2px 4px rgba(0,0,0,0.5);
 }
 
 .input-container {
@@ -219,11 +239,15 @@ body, html {
 
 .input-icon {
   position: absolute;
-  left: 14px;
+  left: 15px;
   top: 50%;
   transform: translateY(-50%);
   color: var(--text-muted);
   pointer-events: none;
+  transition: color 0.2s ease;
+}
+.input-pill:focus + .input-icon {
+  color: var(--accent);
 }
 
 /* カードレイアウト */
@@ -236,55 +260,65 @@ body, html {
 
 .card-item {
   background-color: var(--bg-surface);
-  border-radius: 8px;
-  padding: 14px;
+  border: 1px solid #1a1a1a;
+  border-radius: 12px;
+  padding: 16px;
   display: flex;
   flex-direction: column;
   cursor: pointer;
-  transition: background-color 0.2s, transform 0.1s;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: var(--shadow-medium);
-  border: 1px solid transparent;
+  position: relative;
 }
 
 .card-item:hover {
   background-color: var(--bg-card-hover);
+  border-color: #333;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.4);
 }
 
 .card-item:active {
-  transform: scale(0.98);
+  transform: scale(0.97) translateY(0);
 }
 
 .card-icon {
   color: var(--accent);
-  margin-bottom: 8px;
+  margin-bottom: 10px;
+  transition: transform 0.2s ease;
+}
+.card-item:hover .card-icon {
+  transform: scale(1.1);
 }
 
 .card-title {
   font-size: 14px;
   font-weight: 700;
+  font-family: var(--font-title);
   color: var(--text-bright);
   margin-bottom: 4px;
 }
 
 .card-desc {
-  font-size: 12px;
+  font-size: 11px;
   color: var(--text-muted);
 }
 
 /* ヘッダー */
 .header-container {
-  padding: 24px 16px 12px;
+  padding: 24px 20px 14px;
 }
 
 .header-title {
   font-size: 24px;
-  font-weight: 700;
+  font-weight: 800;
   font-family: var(--font-title);
   color: var(--text-bright);
+  letter-spacing: -0.02em;
 }
 
 .header-subtitle {
-  font-size: 14px;
+  font-size: 13px;
   color: var(--text-muted);
   margin-top: 4px;
 }
@@ -292,13 +326,14 @@ body, html {
 /* マップ */
 .map-container {
   width: 100%;
-  height: 250px;
-  background-color: #0d0d0d;
+  height: 220px;
+  background-color: #080808;
   position: relative;
   overflow: hidden;
-  border-radius: 12px;
+  border-radius: 14px;
   margin: 16px 0;
-  border: 1px solid var(--border-muted);
+  border: 1px solid #1a1a1a;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.4);
 }
 
 .map-element {
@@ -306,83 +341,15 @@ body, html {
   height: 100%;
 }
 
-/* アコーディオンタイムライン */
-.timeline-item {
-  position: relative;
-  padding-left: 28px;
-  margin-bottom: 20px;
-}
-
-.timeline-item:last-child {
-  margin-bottom: 0;
-}
-
-.timeline-item::before {
-  content: "";
-  position: absolute;
-  left: 7px;
-  top: 18px;
-  bottom: -22px;
-  width: 2px;
-  background-color: var(--border-gray);
-  z-index: 1;
-}
-
-.timeline-item.last::before {
-  display: none;
-}
-
-.timeline-item.walk::before {
-  background-image: linear-gradient(to bottom, var(--border-gray) 50%, rgba(255,255,255,0) 0%);
-  background-position: left;
-  background-size: 2px 8px;
-  background-repeat: repeat-y;
-  background-color: transparent;
-}
-
-.timeline-dot {
-  position: absolute;
-  left: 0;
-  top: 4px;
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background-color: var(--bg-base);
-  border: 4px solid var(--border-gray);
-  z-index: 2;
-}
-
-.timeline-dot.active {
-  border-color: var(--accent);
-}
-
-.timeline-time {
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--text-bright);
-}
-
-.timeline-title {
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--text-base);
-}
-
-.timeline-info {
-  font-size: 12px;
-  color: var(--text-muted);
-  margin-top: 2px;
-}
-
 /* ローディング */
 .spinner {
-  border: 3px solid rgba(255, 255, 255, 0.1);
-  width: 36px;
-  height: 36px;
+  border: 3.5px solid rgba(255, 255, 255, 0.05);
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   border-left-color: var(--accent);
-  animation: spin 1s linear infinite;
-  margin: 20px auto;
+  animation: spin 0.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  margin: 30px auto;
 }
 
 @keyframes spin {
@@ -393,6 +360,7 @@ body, html {
 /* --- Tailwind CSS Fallback Utilities (Vanilla CSS) --- */
 .flex { display: flex; }
 .flex-col { flex-direction: column; }
+.flex-grow { flex-grow: 1; }
 .flex-1 { flex: 1; }
 .flex-2 { flex: 2; }
 .items-center { align-items: center; }
@@ -403,6 +371,7 @@ body, html {
 .absolute { position: absolute; }
 .w-full { width: 100%; }
 .h-full { height: 100%; }
+.min-h-0 { min-height: 0; }
 .truncate {
   overflow: hidden;
   text-overflow: ellipsis;
@@ -468,7 +437,7 @@ body, html {
 
 /* 特殊スタイル */
 .bg-gradient-to-b {
-  background: linear-gradient(to bottom, #1c1c1c, #121212);
+  background: linear-gradient(to bottom, #161616, #0a0a0a);
 }
 .bg-transparent { background-color: transparent; }
 .bg-\[\#121212\] { background-color: #121212; }
@@ -478,8 +447,8 @@ body, html {
 .bg-\[\#333333\] { background-color: #333333; }
 .border-b { border-bottom: 1px solid var(--border-gray); }
 .border-t { border-top: 1px solid var(--border-gray); }
-.border-gray-700 { border: 1px solid #4d4d4d; }
-.border-gray-800 { border: 1px solid #2a2a2a; }
+.border-gray-700 { border: 1px solid #282828; }
+.border-gray-800 { border: 1px solid #1a1a1a; }
 .border-none { border: none; }
 .outline-none { outline: none; }
 
@@ -520,4 +489,3 @@ body, html {
 .space-y-6 > * + * {
   margin-top: 24px;
 }
-
