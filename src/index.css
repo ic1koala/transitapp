@@ -1,0 +1,391 @@
+:root {
+  --bg-base: #121212;
+  --bg-surface: #181818;
+  --bg-interactive: #1f1f1f;
+  --bg-card: #252525;
+  --bg-card-hover: #2a2a2a;
+  
+  --accent: #1ed760;
+  --accent-hover: #1fdf64;
+  
+  --text-base: #ffffff;
+  --text-muted: #b3b3b3;
+  --text-bright: #fdfdfd;
+  
+  --border-gray: #4d4d4d;
+  --border-muted: #2a2a2a;
+  
+  --shadow-heavy: rgba(0, 0, 0, 0.5) 0px 8px 24px;
+  --shadow-medium: rgba(0, 0, 0, 0.3) 0px 8px 8px;
+  --shadow-inset: rgb(18, 18, 18) 0px 1px 0px, rgb(124, 124, 124) 0px 0px 0px 1px inset;
+
+  --font-ui: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Meiryo", sans-serif;
+  --font-title: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Meiryo", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body, html {
+  background-color: var(--bg-base);
+  color: var(--text-base);
+  font-family: var(--font-ui);
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  position: fixed;
+  top: 0;
+  left: 0;
+}
+
+#root {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* スクロールバーの非表示（Spotify風） */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #3e3e3e;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #5a5a5a;
+}
+
+/* アプリレイアウト */
+.app-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100%;
+  max-width: 450px; /* iPhone 15 Pro Max 幅に制限（PC閲覧時など） */
+  margin: 0 auto;
+  background-color: var(--bg-base);
+  position: relative;
+  box-shadow: var(--shadow-heavy);
+}
+
+.main-content {
+  flex: 1;
+  overflow-y: auto;
+  padding-bottom: calc(75px + env(safe-area-inset-bottom)); /* ナビバーの高さ + セーフエリア */
+  padding-top: env(safe-area-inset-top);
+  display: flex;
+  flex-direction: column;
+}
+
+/* 底部ナビゲーション */
+.nav-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: calc(65px + env(safe-area-inset-bottom));
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.95), rgba(18, 18, 18, 0.95));
+  border-top: 1px solid var(--border-muted);
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding-bottom: env(safe-area-inset-bottom);
+  z-index: 100;
+}
+
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-family: var(--font-ui);
+  font-size: 11px;
+  cursor: pointer;
+  width: 33.33%;
+  height: 100%;
+  justify-content: center;
+  transition: color 0.2s, transform 0.1s;
+}
+
+.nav-item.active {
+  color: var(--text-base);
+}
+
+.nav-item:active {
+  transform: scale(0.95);
+}
+
+.nav-item svg {
+  margin-bottom: 4px;
+}
+
+/* 共通 UI コンポーネント */
+
+/* ピルボタン */
+.btn-pill {
+  background-color: var(--bg-interactive);
+  color: var(--text-base);
+  border: 1px solid var(--border-gray);
+  border-radius: 9999px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: background-color 0.2s, transform 0.1s;
+}
+
+.btn-pill:hover {
+  background-color: var(--bg-card-hover);
+}
+
+.btn-pill:active {
+  transform: scale(0.95);
+}
+
+.btn-pill-primary {
+  background-color: var(--accent);
+  color: #000000;
+  border: none;
+}
+
+.btn-pill-primary:hover {
+  background-color: var(--accent-hover);
+}
+
+/* 丸形ボタン */
+.btn-circle {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background-color: var(--accent);
+  border: none;
+  color: #000000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: var(--shadow-heavy);
+  transition: transform 0.2s, background-color 0.2s;
+}
+
+.btn-circle:hover {
+  transform: scale(1.05);
+  background-color: var(--accent-hover);
+}
+
+.btn-circle:active {
+  transform: scale(0.95);
+}
+
+/* Spotify風の入力フォーム */
+.input-pill {
+  width: 100%;
+  background-color: var(--bg-interactive);
+  border: 1px solid var(--border-gray);
+  border-radius: 500px;
+  padding: 12px 16px 12px 40px; /* 左側にアイコン用の余白 */
+  color: var(--text-base);
+  font-size: 14px;
+  font-family: var(--font-ui);
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.input-pill:focus {
+  border-color: var(--text-base);
+}
+
+.input-container {
+  position: relative;
+  width: 100%;
+  margin-bottom: 12px;
+}
+
+.input-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+/* カードレイアウト */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  padding: 16px;
+}
+
+.card-item {
+  background-color: var(--bg-surface);
+  border-radius: 8px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+  box-shadow: var(--shadow-medium);
+  border: 1px solid transparent;
+}
+
+.card-item:hover {
+  background-color: var(--bg-card-hover);
+}
+
+.card-item:active {
+  transform: scale(0.98);
+}
+
+.card-icon {
+  color: var(--accent);
+  margin-bottom: 8px;
+}
+
+.card-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-bright);
+  margin-bottom: 4px;
+}
+
+.card-desc {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* ヘッダー */
+.header-container {
+  padding: 24px 16px 12px;
+}
+
+.header-title {
+  font-size: 24px;
+  font-weight: 700;
+  font-family: var(--font-title);
+  color: var(--text-bright);
+}
+
+.header-subtitle {
+  font-size: 14px;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+/* マップ */
+.map-container {
+  width: 100%;
+  height: 250px;
+  background-color: #0d0d0d;
+  position: relative;
+  overflow: hidden;
+  border-radius: 12px;
+  margin: 16px 0;
+  border: 1px solid var(--border-muted);
+}
+
+.map-element {
+  width: 100%;
+  height: 100%;
+}
+
+/* アコーディオンタイムライン */
+.timeline-item {
+  position: relative;
+  padding-left: 28px;
+  margin-bottom: 20px;
+}
+
+.timeline-item:last-child {
+  margin-bottom: 0;
+}
+
+.timeline-item::before {
+  content: "";
+  position: absolute;
+  left: 7px;
+  top: 18px;
+  bottom: -22px;
+  width: 2px;
+  background-color: var(--border-gray);
+  z-index: 1;
+}
+
+.timeline-item.last::before {
+  display: none;
+}
+
+.timeline-item.walk::before {
+  background-image: linear-gradient(to bottom, var(--border-gray) 50%, rgba(255,255,255,0) 0%);
+  background-position: left;
+  background-size: 2px 8px;
+  background-repeat: repeat-y;
+  background-color: transparent;
+}
+
+.timeline-dot {
+  position: absolute;
+  left: 0;
+  top: 4px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background-color: var(--bg-base);
+  border: 4px solid var(--border-gray);
+  z-index: 2;
+}
+
+.timeline-dot.active {
+  border-color: var(--accent);
+}
+
+.timeline-time {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-bright);
+}
+
+.timeline-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-base);
+}
+
+.timeline-info {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+/* ローディング */
+.spinner {
+  border: 3px solid rgba(255, 255, 255, 0.1);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border-left-color: var(--accent);
+  animation: spin 1s linear infinite;
+  margin: 20px auto;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
